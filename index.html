@@ -19,7 +19,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Noto+Serif+SC:wght@500;700&display=swap">
 <style>
 :root{
-  --paper:#f2ebdd;--sheet:#f8f3e8;--wash:#e9dfcc;--ink:#1f1b16;--ink-2:#4a4239;--muted:#7a6f61;--rule:#d6c9b3;--rule-strong:#b9aa92;
+  --paper:#f2ebdd;--sheet:#f8f3e8;--wash:#e9dfcc;--ink:#1f1b16;--ink-2:#4a4239;--muted:#6a5f52;--rule:#d6c9b3;--rule-strong:#b9aa92;
   --seal:#b3321e;--seal-ink:#fbf4e8;--seal-wash:#efd8cb;--grain:.05;color-scheme:light;
   --serif:"Cormorant Garamond","EB Garamond",Georgia,serif;--sans:"Alegreya Sans","Gill Sans","Segoe UI",sans-serif;--han:"Noto Serif SC","Songti SC","STSong",serif}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
@@ -124,18 +124,18 @@ h2{font-family:var(--serif);font-weight:600;font-size:1.5rem;line-height:1.1;mar
 .pop{position:absolute;top:12px;right:16px;font-family:var(--serif);font-weight:700;font-size:1.4rem;color:var(--seal);font-variant-numeric:lining-nums;animation:pop .5s cubic-bezier(.2,1.4,.4,1)}
 .pop.miss{color:var(--muted);font-style:italic;font-weight:600;font-size:1.2rem}
 @keyframes pop{from{transform:scale(1.5) rotate(-6deg);opacity:0}to{transform:none;opacity:1}}
-.options{display:flex;flex-direction:column;border-top:1px solid var(--ink);margin-top:-6px}
-.options button{position:relative;min-height:62px;text-align:left;padding:10px 52px 10px 2px;font-size:1.12rem;display:flex;flex-direction:column;justify-content:center;border-bottom:1px solid var(--rule);transition:background .15s}
+.options{display:flex;flex-direction:column;gap:10px}
+.options button{position:relative;min-height:68px;text-align:left;padding:10px 54px 10px 18px;font-family:var(--serif);font-weight:600;font-size:1.45rem;line-height:1.2;color:var(--ink);display:flex;flex-direction:column;justify-content:center;background:var(--sheet);border:1.5px solid var(--rule-strong);border-radius:4px;transition:background .15s,border-color .15s}
 .options button:active{background:var(--wash)}
-.options .zh{font-size:1.75rem;line-height:1.2}
-.options .opt-py{font-size:.9rem;color:var(--muted);font-style:italic}
+.options .zh{font-size:2rem;line-height:1.15;font-weight:600}
+.options .opt-py{font-family:var(--sans);font-size:1.05rem;font-weight:500;color:var(--ink-2)}
 .options button::after{content:"";position:absolute;right:6px;top:50%;width:30px;height:30px;margin-top:-15px;border-radius:3px}
-.options button.right{background:linear-gradient(90deg,transparent,var(--seal-wash))}
+.options button.right{background:var(--seal-wash);border-color:var(--seal)}
 .options button.right::after{background:var(--seal) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fbf4e8' stroke-width='2.6' stroke-linecap='square'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/20px no-repeat;transform:rotate(-4deg);animation:pop .4s cubic-bezier(.2,1.4,.4,1)}
-.options button.wrong{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
+.options button.wrong{color:var(--ink-2);border-color:var(--ink-2);text-decoration:line-through;text-decoration-thickness:2px}
 .options button.wrong::after{border:1.5px solid var(--muted);background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23887d6e' stroke-width='2.4'%3E%3Cpath d='M7 7l10 10M17 7 7 17'/%3E%3C/svg%3E") center/16px no-repeat}
 .options button:disabled{cursor:default}
-.options button:disabled:not(.right):not(.wrong){opacity:.45}
+.options button:disabled:not(.right):not(.wrong){opacity:.6}
 
 /* practice */
 .row{display:flex;gap:10px}
