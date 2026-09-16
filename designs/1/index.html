@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Mandarin Flashcards</title>
 <meta name="description" content="Mandarin vocab flashcards with a leaderboard for every lesson.">
-<meta name="theme-color" content="#2f6f5e">
+<meta name="theme-color" content="#f3eee3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#171511" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -15,160 +16,212 @@
 <link rel="manifest" href="../../manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;700;800&family=Noto+Serif+SC:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Instrument+Sans:ital,wght@0,400..600;1,400..500&family=Noto+Serif+SC:wght@400;600&display=swap">
 <style>
-:root{--bg:#f6f8f7;--surface:#fff;--ink:#1b2320;--muted:#5d6b66;--line:#dde4e1;--accent:#2f6f5e;--accent-soft:#e3efeb;--bad:#a8572b;--bad-soft:#f6e9e1;--gold:#9a7412;--gold-soft:#f7efd9;color-scheme:light}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121816;--surface:#19211e;--ink:#e6ece9;--muted:#93a39d;--line:#2a3531;--accent:#7cc3ad;--accent-soft:#1f2e29;--bad:#e39a72;--bad-soft:#2e231d;--gold:#e0bd5c;--gold-soft:#2c2718;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#121816;--surface:#19211e;--ink:#e6ece9;--muted:#93a39d;--line:#2a3531;--accent:#7cc3ad;--accent-soft:#1f2e29;--bad:#e39a72;--bad-soft:#2e231d;--gold:#e0bd5c;--gold-soft:#2c2718;color-scheme:dark}
+:root{--bg:#f3eee3;--ink:#221d17;--soft:#4a4238;--muted:#877c6d;--rule:#d8cebd;--rule-strong:#221d17;--accent:#a93a22;--accent-wash:#ecdccb;--good:#3d6a4a;--mark:#e9dfc7;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171511;--ink:#ebe3d3;--soft:#c4baa8;--muted:#8d8474;--rule:#34302a;--rule-strong:#ebe3d3;--accent:#e38563;--accent-wash:#2e211b;--good:#9cc3a4;--mark:#26221c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#171511;--ink:#ebe3d3;--soft:#c4baa8;--muted:#8d8474;--rule:#34302a;--rule-strong:#ebe3d3;--accent:#e38563;--accent-wash:#2e211b;--good:#9cc3a4;--mark:#26221c;color-scheme:dark}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Figtree,system-ui,sans-serif;padding:calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 32px);-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Instrument Sans",system-ui,sans-serif;padding:calc(env(safe-area-inset-top) + 20px) 20px calc(env(safe-area-inset-bottom) + 40px);-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
 [hidden]{display:none!important}
-.view{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.view{max-width:540px;margin:0 auto;display:flex;flex-direction:column}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 button,input{font:inherit;color:inherit}
-button{touch-action:manipulation;cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 16px;font-weight:600;min-height:48px}
-button:active{transform:scale(.98)}
-button:focus-visible,input:focus-visible,.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:800}
-.big-btn{width:100%;font-size:1.1rem;min-height:58px}
-.zh{font-family:"Noto Serif SC","Songti SC",serif}
-h1{font-size:1.9rem;line-height:1.15;margin:0;font-weight:800;text-wrap:balance}
-h2{font-size:1.1rem;margin:0}
-.sub{color:var(--muted);margin:4px 0 0}
-.label{font-size:.75rem;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin:0 0 8px}
-.top{display:flex;align-items:center;gap:10px}
-.icon-btn{min-width:48px;padding:0;display:grid;place-items:center;flex:none}
-.icon-btn svg{width:22px;height:22px}
-.top .grow{flex:1;min-width:0}
-.standings{display:flex;gap:10px}
-.standings>div{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;min-width:0}
-.standings .n{font-size:1.6rem;font-weight:800;font-variant-numeric:tabular-nums}
-.standings .who{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.standings .lead{border-color:var(--gold);background:var(--gold-soft)}
-.lessons{display:flex;flex-direction:column;gap:10px}
-.lesson{display:flex;align-items:center;gap:12px;text-align:left;width:100%;padding:14px 16px;border-radius:14px}
-.lesson .grow{flex:1;min-width:0}
-.lesson .name{font-weight:700;font-size:1.05rem}
-.lesson .meta{color:var(--muted);font-size:.85rem;font-weight:500}
-.lesson .best{text-align:right;font-size:.85rem;font-weight:500;color:var(--muted);flex:none}
-.lesson .best b{display:block;color:var(--gold);font-size:1rem;font-variant-numeric:tabular-nums}
-.chev{width:18px;height:18px;color:var(--muted);flex:none}
-.board{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+button{touch-action:manipulation;cursor:pointer;border:0;background:none;padding:0;min-height:44px;border-radius:0;text-align:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.serif,h1,h2,.final{font-family:Fraunces,Georgia,serif;font-optical-sizing:auto}
+.zh{font-family:"Noto Serif SC","Songti SC",serif;font-weight:400}
+h1{font-size:2.6rem;line-height:1.02;margin:0;font-weight:400;letter-spacing:-.02em;text-wrap:balance}
+h2{font-size:1.25rem;margin:0;font-weight:400}
+.sub{color:var(--soft);margin:12px 0 0;font-size:.98rem;max-width:32ch}
+.kicker{font-family:Fraunces,Georgia,serif;font-style:italic;font-size:1.05rem;color:var(--muted);margin:0}
+.head{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--rule-strong);padding-bottom:6px;margin:40px 0 0}
+.head .aside{font-size:.82rem;color:var(--muted)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 22px;border:1px solid var(--rule-strong);font-weight:500;font-size:1rem;border-radius:2px;transition:background .15s,color .15s}
+.btn:active{opacity:.8}
+.primary{background:var(--ink);color:var(--bg);border:1px solid var(--ink);border-radius:2px;font-weight:500}
+.primary:disabled{opacity:.6}
+.textlink{display:inline-flex;align-items:center;gap:8px;color:var(--soft);font-size:.95rem;font-weight:500}
+.textlink svg{width:18px;height:18px}
+
+.masthead{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--rule);padding-bottom:4px;margin-bottom:34px}
+.masthead .issue{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--muted);font-size:.95rem}
+.langs{display:flex;gap:18px}
+.langs button{font-size:.95rem;color:var(--muted);font-weight:500;position:relative;padding:0 2px}
+.langs button[aria-pressed="true"]{color:var(--ink)}
+.langs button[aria-pressed="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:2px;background:var(--accent)}
+
+.standings{display:flex;margin-top:14px}
+.standings>div{flex:1;min-width:0;padding:0 14px;border-left:1px solid var(--rule)}
+.standings>div:first-child{padding-left:0;border-left:0}
+.standings .n{font-family:Fraunces,Georgia,serif;font-size:2.4rem;line-height:1;font-weight:300;font-variant-numeric:lining-nums tabular-nums}
+.standings .lead .n{color:var(--accent)}
+.standings .who{font-size:.8rem;font-weight:600;letter-spacing:.08em;margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.standings .sub{margin-top:2px;font-size:.88rem}
+
+.lessons{display:flex;flex-direction:column;counter-reset:toc}
+.lesson{display:grid;grid-template-columns:2.4rem 1fr auto;align-items:baseline;gap:0 8px;width:100%;padding:14px 0 13px;border-bottom:1px solid var(--rule);min-height:60px}
+.lesson:active{background:var(--mark)}
+.lesson .no{font-family:Fraunces,Georgia,serif;font-size:.95rem;color:var(--muted);font-variant-numeric:lining-nums tabular-nums}
+.lesson .name{font-family:Fraunces,Georgia,serif;font-size:1.3rem;line-height:1.2}
+.lesson .meta{color:var(--muted);font-size:.8rem;margin-top:1px}
+.lesson .best{text-align:right;font-size:.75rem;color:var(--muted);letter-spacing:.06em}
+.lesson .best b{display:block;font-family:Fraunces,Georgia,serif;font-weight:400;font-size:1.05rem;letter-spacing:0;color:var(--ink);font-variant-numeric:lining-nums tabular-nums}
+.lesson .best i{font-family:Fraunces,Georgia,serif;letter-spacing:0;font-size:.9rem}
+.more{display:flex;justify-content:space-between;align-items:center;width:100%;margin-top:28px;padding:14px 0;border-top:1px solid var(--rule-strong);border-bottom:1px solid var(--rule-strong);font-family:Fraunces,Georgia,serif;font-size:1.2rem}
+.more svg{width:20px;height:20px;color:var(--accent)}
+.colophon{margin:22px 0 0;color:var(--muted);font-size:.8rem;font-style:italic;font-family:Fraunces,Georgia,serif;text-align:center}
+
+.back{margin:-8px 0 18px -2px;align-self:flex-start}
+.titleblock{border-bottom:1px solid var(--rule);padding-bottom:20px}
+.titleblock h1{font-size:2.9rem}
+.actions{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:22px}
+.actions .btn{padding:0 18px}
+
 .board ol{list-style:none;margin:0;padding:0}
-.board li{display:grid;grid-template-columns:32px 1fr auto;gap:4px 10px;align-items:baseline;padding:12px 14px;border-bottom:1px solid var(--line)}
-.board li:last-child{border-bottom:0}
-.board .rank{font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
-.board li:first-child .rank{color:var(--gold)}
-.board .nm{font-weight:700;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.board .pts{font-weight:800;font-variant-numeric:tabular-nums;text-align:right}
+.board li{display:grid;grid-template-columns:2rem 1fr auto;gap:0 10px;align-items:baseline;padding:13px 0 12px;border-bottom:1px solid var(--rule)}
+.board .rank{font-family:Fraunces,Georgia,serif;color:var(--muted);font-variant-numeric:lining-nums tabular-nums}
+.board li:first-child .rank{color:var(--accent);font-style:italic}
+.board .nm{font-weight:600;letter-spacing:.09em;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.board .pts{font-family:Fraunces,Georgia,serif;font-size:1.2rem;font-variant-numeric:lining-nums tabular-nums;text-align:right}
+.board li:first-child .pts{font-size:1.45rem}
 .board .det{grid-column:2/4;color:var(--muted);font-size:.8rem}
-.board li.me{background:var(--gold-soft)}
-.board .empty{padding:18px 14px;color:var(--muted)}
-.hud{display:flex;justify-content:space-between;align-items:center;gap:10px;font-variant-numeric:tabular-nums}
-.hud .score{font-weight:800;font-size:1.3rem}
-.hud .q{color:var(--muted);font-weight:600}
-.timer{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.board li.me{background:var(--mark);box-shadow:-8px 0 0 var(--mark),8px 0 0 var(--mark)}
+.board .empty{padding:18px 0;color:var(--muted);font-family:Fraunces,Georgia,serif;font-style:italic;margin:0;border-bottom:1px solid var(--rule)}
+
+.gamebar{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.hud{display:flex;align-items:center;gap:14px;font-variant-numeric:lining-nums tabular-nums}
+.hud .q{color:var(--muted);font-size:.9rem}
+.hud .score{font-family:Fraunces,Georgia,serif;font-size:1.5rem;line-height:1;padding-left:14px;border-left:1px solid var(--rule);min-width:3ch;text-align:right}
+.timer{height:2px;background:var(--rule);margin-top:8px}
 .timer i{display:block;height:100%;width:100%;background:var(--accent);transform-origin:left}
-.card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:28px 18px;min-height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;box-shadow:0 6px 24px rgb(0 0 0 / .06)}
-.card .ask{font-size:.75rem;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase}
-.card .word{font-size:clamp(1.5rem,7vw,2.1rem);font-weight:800;text-wrap:balance}
-.card .word.zh{font-size:clamp(3rem,16vw,4.6rem);font-weight:500;line-height:1.15}
-.card .py{color:var(--accent);font-size:1.25rem}
-.card .hint{color:var(--muted);font-size:.85rem;margin-top:6px}
-.card .reveal{margin-top:10px;padding-top:12px;border-top:1px solid var(--line);min-width:60%;display:flex;flex-direction:column;gap:2px}
-.card .reveal .en{font-size:1.2rem;font-weight:600}
-.card .reveal .zh{font-size:2.4rem}
-.pop{position:absolute;top:12px;right:14px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;animation:pop .7s ease-out}
-.pop.miss{color:var(--bad)}
-@keyframes pop{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
-.options{display:flex;flex-direction:column;gap:10px}
-.options button{min-height:60px;text-align:left;padding:10px 16px;font-size:1.05rem;display:flex;flex-direction:column;justify-content:center;border-radius:14px}
-.options .zh{font-size:1.6rem;font-weight:500;line-height:1.2}
-.options .opt-py{font-size:.85rem;color:var(--muted);font-weight:500}
-.options button.right{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
-.options button.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+
+.card{position:relative;padding:34px 8px 30px;min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;border-bottom:1px solid var(--rule)}
+#qCard{margin-bottom:6px}
+#pCard{cursor:pointer;margin-top:8px;min-height:min(300px,42vh)}
+.card .ask{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--muted);font-size:1rem;margin-bottom:6px}
+.card .word{font-family:Fraunces,Georgia,serif;font-size:clamp(1.8rem,8vw,2.4rem);line-height:1.12;text-wrap:balance}
+.card .word.zh{font-family:"Noto Serif SC",serif;font-size:clamp(3.4rem,19vw,5.2rem);font-weight:400;line-height:1.1}
+.card .word.de{font-size:clamp(2.1rem,10vw,2.9rem)}
+.card .py{color:var(--accent);font-size:1.1rem;font-style:italic;letter-spacing:.01em;margin-top:4px}
+.card .hint{color:var(--muted);font-size:.85rem;margin-top:18px;letter-spacing:.02em}
+.card .reveal{margin-top:22px;padding-top:18px;border-top:1px solid var(--rule);min-width:55%;display:flex;flex-direction:column;align-items:center;gap:2px}
+.card .reveal .en{font-family:Fraunces,Georgia,serif;font-size:1.45rem;font-style:italic}
+.card .reveal .zh{font-size:2.6rem}
+.card .reveal .de{font-family:Fraunces,Georgia,serif;font-size:1.8rem}
+.card .primary{margin-top:20px;min-height:50px;padding:0 24px}
+.pop{position:absolute;top:10px;right:0;font-family:Fraunces,Georgia,serif;font-size:1.1rem;color:var(--good);font-variant-numeric:lining-nums tabular-nums;animation:pop .6s ease-out}
+.pop.miss{color:var(--accent);font-style:italic}
+@keyframes pop{from{transform:translateY(6px);opacity:0}to{transform:none;opacity:1}}
+
+.options{display:flex;flex-direction:column;counter-reset:opt}
+.options button{counter-increment:opt;position:relative;display:flex;flex-direction:column;justify-content:center;min-height:64px;padding:10px 12px 10px 40px;border-bottom:1px solid var(--rule);font-size:1.08rem;line-height:1.3;transition:background .15s}
+.options button::before{content:counter(opt,lower-alpha);position:absolute;left:4px;top:50%;transform:translateY(-52%);font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--muted);font-size:1rem}
+.options button:active{background:var(--mark)}
+.options .zh{font-size:1.7rem;line-height:1.2}
+.options .de{font-family:Fraunces,Georgia,serif;font-size:1.3rem}
+.options .opt-py{font-size:.82rem;color:var(--muted);font-style:italic}
+.options button.right{background:var(--mark);color:var(--good)}
+.options button.right::before{content:"\2713";font-style:normal;color:var(--good)}
+.options button.wrong{color:var(--accent)}
+.options button.wrong::before{content:"\2717";font-style:normal;color:var(--accent)}
+.options button.wrong>*,.options button.wrong{text-decoration:line-through;text-decoration-thickness:1px}
 .options button:disabled{cursor:default}
-.options button:disabled:not(.right):not(.wrong){opacity:.55}
+.options button:disabled:not(.right):not(.wrong){opacity:.45}
+
 .row{display:flex;gap:10px}
 .row>button{flex:1}
-.seg button[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
-.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
-.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
-.progress{display:flex;justify-content:space-between;color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums;margin-bottom:6px}
-.again{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
-.gotit{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
-.result{text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:28px 18px;display:flex;flex-direction:column;gap:6px;align-items:center}
-.result .final{font-size:3.4rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
-.result .rankline{font-weight:700;color:var(--gold)}
-.arcade{display:flex;flex-direction:column;gap:10px}
-.arcade input{width:100%;font-size:1.6rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;text-align:center;padding:14px;border:2px solid var(--accent);border-radius:14px;background:var(--surface)}
-.arcade input::placeholder{letter-spacing:.06em;font-weight:600;color:var(--muted);text-transform:none}
-.msg{color:var(--bad);font-size:.9rem;text-align:center;margin:0}
-.search{position:sticky;top:0;z-index:2;background:var(--bg);padding:calc(env(safe-area-inset-top) + 8px) 0 8px;margin-top:calc(-1 * env(safe-area-inset-top));display:flex;gap:10px}
-.search input{flex:1;min-width:0;font-size:16px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
-.words section{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.words h2{display:flex;justify-content:space-between;align-items:baseline;padding:12px 14px;border-bottom:1px solid var(--line)}
-.words h2 span{font-size:.75rem;font-weight:600;color:var(--muted)}
-.w{display:grid;grid-template-columns:auto 1fr;gap:0 12px;padding:10px 14px;border-bottom:1px solid var(--line)}
-.w:last-child{border-bottom:0}
-.w .zh{font-size:1.35rem;grid-row:span 2;align-self:center;min-width:3.2em}
-.w .py{color:var(--accent);font-size:.9rem}
-.hide-en .w .en{color:transparent;background:var(--accent-soft);border-radius:4px}
-.words{display:flex;flex-direction:column;gap:14px}
-.card .word.de{font-size:clamp(1.9rem,9vw,2.7rem)}
-.card .reveal .de{font-size:1.6rem;font-weight:700}
-.options .de{font-size:1.15rem;font-weight:700}
-.w .de{font-weight:700;grid-row:span 2;align-self:center;min-width:7em}
-.langs{display:flex;gap:10px}
-.langs button{flex:1}
-.langs button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.seg{display:flex;gap:22px;border-bottom:1px solid var(--rule);margin-top:18px}
+.seg button{color:var(--muted);font-size:.95rem;font-weight:500;position:relative}
+.seg button[aria-pressed="true"]{color:var(--ink)}
+.seg button[aria-pressed="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--accent)}
+.progress{display:flex;justify-content:space-between;color:var(--muted);font-size:.85rem;font-variant-numeric:lining-nums tabular-nums;margin:16px 0 8px}
+.bar{height:2px;background:var(--rule)}
+.bar i{display:block;height:100%;width:0;background:var(--ink);transition:width .25s}
+#pGrade{margin-top:18px}
+.again{border:1px solid var(--rule-strong);color:var(--ink)}
+.gotit{background:var(--ink);color:var(--bg);border:1px solid var(--ink)}
+.again,.gotit{min-height:56px;border-radius:2px;font-weight:500;text-align:center}
+
+.result{text-align:center;padding:10px 0 28px;border-bottom:1px solid var(--rule);display:flex;flex-direction:column;align-items:center}
+.result .kicker{margin-bottom:10px}
+.result .final{font-size:5.2rem;line-height:.95;font-weight:300;letter-spacing:-.03em;font-variant-numeric:lining-nums tabular-nums}
+.result .sub{margin-top:12px}
+.result .rankline{margin:8px 0 0;color:var(--accent);font-family:Fraunces,Georgia,serif;font-style:italic;font-size:1.1rem}
+.rankline:empty{display:none}
+.arcade{display:flex;flex-direction:column;gap:14px;margin-top:26px}
+.arcade label{font-family:Fraunces,Georgia,serif;font-style:italic;color:var(--muted);text-align:center}
+.arcade input{width:100%;font-family:Fraunces,Georgia,serif;font-size:2rem;letter-spacing:.16em;text-transform:uppercase;text-align:center;padding:8px 4px;border:0;border-bottom:1px solid var(--rule-strong);background:transparent;border-radius:0}
+.arcade input:focus{outline:0;border-bottom:2px solid var(--accent)}
+.arcade input::placeholder{letter-spacing:.02em;color:var(--muted);text-transform:none;font-style:italic;font-size:1.4rem}
+.arcade .primary{min-height:54px;width:100%}
+.msg{color:var(--accent);font-size:.9rem;text-align:center;margin:0}
+.after{display:flex;justify-content:space-between;margin-top:14px}
+
+.search{position:sticky;top:0;z-index:2;background:var(--bg);padding:calc(env(safe-area-inset-top) + 8px) 0 0;margin:14px 0 0;margin-top:calc(14px - env(safe-area-inset-top));display:flex;gap:14px;align-items:center;border-bottom:1px solid var(--rule-strong)}
+.search input{flex:1;min-width:0;font-size:16px;padding:12px 0;border:0;background:transparent;border-radius:0}
+.search input:focus{outline:0}
+.search button{color:var(--accent);font-size:.9rem;font-weight:500;flex:none}
+.words{display:flex;flex-direction:column;gap:6px}
+.words section{margin-top:26px}
+.words h2{display:flex;justify-content:space-between;align-items:baseline;font-size:1.45rem;padding-bottom:6px;border-bottom:1px solid var(--rule)}
+.words h2 span{font-family:"Instrument Sans",sans-serif;font-size:.78rem;color:var(--muted)}
+.w{display:grid;grid-template-columns:auto 1fr;gap:0 16px;padding:11px 0;border-bottom:1px solid var(--rule)}
+.w .zh{font-size:1.5rem;line-height:1.25;grid-row:span 2;align-self:center;min-width:3em}
+.w:has(.de){grid-template-columns:minmax(0,48%) 1fr}
+.w .de{font-family:Fraunces,Georgia,serif;font-size:1.1rem;line-height:1.3;grid-row:span 2;align-self:center}
+.w .py{color:var(--accent);font-size:.88rem;font-style:italic}
+.w .en{color:var(--soft);font-size:.95rem;align-self:center}
+.w:has(.py) .en{align-self:start}
+.hide-en .w .en{color:transparent;background:var(--mark);border-radius:1px}
 </style>
 </head>
 <body>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></symbol>
-  <symbol id="i-next" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></symbol>
-  <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></symbol>
 </svg>
 
 <main class="view" id="home">
-  <div class="langs" role="group" aria-label="Language">
-    <button type="button" data-lang="zh" aria-pressed="true">Mandarin</button>
-    <button type="button" data-lang="de" aria-pressed="false">German</button>
+  <div class="masthead">
+    <span class="issue">Flashcards</span>
+    <div class="langs" role="group" aria-label="Language">
+      <button type="button" data-lang="zh" aria-pressed="true">Mandarin</button>
+      <button type="button" data-lang="de" aria-pressed="false">German</button>
+    </div>
   </div>
-  <div>
-    <h1 id="homeTitle">Mandarin flashcards</h1>
-    <p class="sub">Pick a lesson, play for points, put your name on the board.</p>
-  </div>
-  <div>
-    <p class="label">Lessons won</p>
-    <div class="standings" id="standings"></div>
-  </div>
-  <div>
-    <p class="label">Lessons</p>
-    <div class="lessons" id="lessonList"></div>
-  </div>
-  <button type="button" class="big-btn" id="openWords">Full word list</button>
+  <h1 id="homeTitle">Mandarin flashcards</h1>
+  <p class="sub">Pick a lesson, play for points, put your name on the board.</p>
+  <div class="head"><h2>Lessons won</h2><span class="aside">Top score holders</span></div>
+  <div class="standings" id="standings"></div>
+  <div class="head"><h2>Contents</h2><span class="aside">Best score</span></div>
+  <div class="lessons" id="lessonList"></div>
+  <button type="button" class="more" id="openWords">Full word list <svg><use href="#i-next"/></svg></button>
 </main>
 
 <main class="view" id="lesson" hidden>
-  <div class="top">
-    <button type="button" class="icon-btn" data-home aria-label="Back to lessons"><svg><use href="#i-back"/></svg></button>
-    <div class="grow"><h1 id="lessonTitle"></h1><p class="sub" id="lessonMeta"></p></div>
+  <button type="button" class="textlink back" data-home aria-label="Back to lessons"><svg><use href="#i-back"/></svg>Contents</button>
+  <div class="titleblock">
+    <p class="kicker">Lesson</p>
+    <h1 id="lessonTitle"></h1>
+    <p class="sub" id="lessonMeta"></p>
+    <div class="actions">
+      <button type="button" class="btn primary" id="play">Play for score</button>
+      <button type="button" class="btn" id="practise">Practise</button>
+    </div>
   </div>
-  <button type="button" class="primary big-btn" id="play">Play for score</button>
-  <button type="button" class="big-btn" id="practise">Practise (no score)</button>
-  <div>
-    <p class="label">Leaderboard</p>
-    <div class="board" id="board"></div>
-  </div>
+  <div class="head"><h2>Leaderboard</h2><span class="aside">Points</span></div>
+  <div class="board" id="board"></div>
 </main>
 
 <main class="view" id="game" hidden>
-  <div class="top">
-    <button type="button" class="icon-btn" id="quit" aria-label="Quit this round"><svg><use href="#i-x"/></svg></button>
-    <div class="grow hud"><span class="q" id="qNum"></span><span class="score" id="gScore">0</span></div>
+  <div class="gamebar">
+    <button type="button" class="textlink" id="quit" aria-label="Quit this round"><svg><use href="#i-x"/></svg>Quit</button>
+    <div class="hud"><span class="q" id="qNum"></span><span class="score" id="gScore">0</span></div>
   </div>
   <div class="timer"><i id="timerFill"></i></div>
   <div class="card" id="qCard" aria-live="polite"></div>
@@ -177,29 +230,28 @@ h2{font-size:1.1rem;margin:0}
 
 <main class="view" id="result" hidden>
   <div class="result">
-    <p class="label" id="rLesson"></p>
+    <p class="kicker" id="rLesson"></p>
     <div class="final" id="rScore"></div>
     <p class="sub" id="rDetail"></p>
     <p class="rankline" id="rRank"></p>
   </div>
   <form class="arcade" id="nameForm">
-    <p class="label" style="text-align:center;margin:0">Enter your name</p>
+    <label for="nameInput">Sign the board</label>
     <input id="nameInput" maxlength="12" autocomplete="nickname" autocapitalize="characters" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="Your name" required>
-    <button type="submit" class="primary big-btn" id="saveBtn">Save to leaderboard</button>
+    <button type="submit" class="btn primary" id="saveBtn">Save to leaderboard</button>
     <p class="msg" id="saveMsg" hidden></p>
   </form>
-  <div class="row">
-    <button type="button" id="replay">Play again</button>
-    <button type="button" id="skipSave">Don't save</button>
+  <div class="after">
+    <button type="button" class="textlink" id="replay">Play again</button>
+    <button type="button" class="textlink" id="skipSave">Don't save</button>
   </div>
 </main>
 
 <main class="view" id="practice" hidden>
-  <div class="top">
-    <button type="button" class="icon-btn" id="endPractice" aria-label="Back to lesson"><svg><use href="#i-back"/></svg></button>
-    <div class="grow"><h2 id="pTitle"></h2></div>
-  </div>
-  <div class="row seg">
+  <button type="button" class="textlink back" id="endPractice" aria-label="Back to lesson"><svg><use href="#i-back"/></svg>Lesson</button>
+  <p class="kicker">Practice</p>
+  <h1 id="pTitle"></h1>
+  <div class="seg">
     <button type="button" data-dir="zh" aria-pressed="true" id="dirTarget">Chinese first</button>
     <button type="button" data-dir="en" aria-pressed="false">English first</button>
   </div>
@@ -215,10 +267,8 @@ h2{font-size:1.1rem;margin:0}
 </main>
 
 <main class="view" id="words" hidden>
-  <div class="top">
-    <button type="button" class="icon-btn" data-home aria-label="Back to lessons"><svg><use href="#i-back"/></svg></button>
-    <div class="grow"><h1>Word list</h1></div>
-  </div>
+  <button type="button" class="textlink back" data-home aria-label="Back to lessons"><svg><use href="#i-back"/></svg>Contents</button>
+  <h1>Word list</h1>
   <div class="search">
     <input id="q" type="search" placeholder="Search Chinese, pinyin or English"  aria-label="Search vocabulary">
     <button type="button" id="toggleEn" aria-pressed="false">Hide English</button>
@@ -303,9 +353,9 @@ function renderHome(){
   $("standings").innerHTML=scoresError?`<div><div class="who">Scores could not load</div><div class="sub">Check your connection and reopen.</div></div>`:
     ranked.length?ranked.slice(0,3).map(([n,c],i)=>`<div class="${i===0&&c>(ranked[1]?.[1]||0)?"lead":""}"><div class="n">${c}</div><div class="who">${esc(n)}</div></div>`).join(""):
     `<div><div class="who">No scores yet</div><div class="sub">Play a lesson to claim it.</div></div>`;
-  $("lessonList").innerHTML=D.map(([name])=>{
+  $("lessonList").innerHTML=D.map(([name],i)=>{
     const top=boardFor(name)[0];
-    return `<button type="button" class="lesson" data-lesson="${esc(name)}"><div class="grow"><div class="name">${esc(name)}</div><div class="meta">${words(name).length} words</div></div><div class="best">${top?`<b>${fmt(top.score)}</b>${esc(top.name)}`:"Unclaimed"}</div><svg class="chev"><use href="#i-next"/></svg></button>`;
+    return `<button type="button" class="lesson" data-lesson="${esc(name)}"><span class="no">${String(i+1).padStart(2,"0")}</span><div class="grow"><div class="name">${esc(name)}</div><div class="meta">${words(name).length} words</div></div><div class="best">${top?`<b>${fmt(top.score)}</b>${esc(top.name)}`:"<i>Unclaimed</i>"}</div></button>`;
   }).join("");
 }
 
