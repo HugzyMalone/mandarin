@@ -115,6 +115,13 @@ h2{font-size:1.1rem;margin:0}
 .w .py{color:var(--accent);font-size:.9rem}
 .hide-en .w .en{color:transparent;background:var(--accent-soft);border-radius:4px}
 .words{display:flex;flex-direction:column;gap:14px}
+.card .word.de{font-size:clamp(1.9rem,9vw,2.7rem)}
+.card .reveal .de{font-size:1.6rem;font-weight:700}
+.options .de{font-size:1.15rem;font-weight:700}
+.w .de{font-weight:700;grid-row:span 2;align-self:center;min-width:7em}
+.langs{display:flex;gap:10px}
+.langs button{flex:1}
+.langs button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
 </style>
 </head>
 <body>
@@ -126,8 +133,12 @@ h2{font-size:1.1rem;margin:0}
 </svg>
 
 <main class="view" id="home">
+  <div class="langs" role="group" aria-label="Language">
+    <button type="button" data-lang="zh" aria-pressed="true">Mandarin</button>
+    <button type="button" data-lang="de" aria-pressed="false">German</button>
+  </div>
   <div>
-    <h1>Mandarin flashcards</h1>
+    <h1 id="homeTitle">Mandarin flashcards</h1>
     <p class="sub">Pick a lesson, play for points, put your name on the board.</p>
   </div>
   <div>
@@ -189,7 +200,7 @@ h2{font-size:1.1rem;margin:0}
     <div class="grow"><h2 id="pTitle"></h2></div>
   </div>
   <div class="row seg">
-    <button type="button" data-dir="zh" aria-pressed="true">Chinese first</button>
+    <button type="button" data-dir="zh" aria-pressed="true" id="dirTarget">Chinese first</button>
     <button type="button" data-dir="en" aria-pressed="false">English first</button>
   </div>
   <div>
@@ -209,7 +220,7 @@ h2{font-size:1.1rem;margin:0}
     <div class="grow"><h1>Word list</h1></div>
   </div>
   <div class="search">
-    <input id="q" type="search" placeholder="Search Chinese, pinyin or English" aria-label="Search vocabulary">
+    <input id="q" type="search" placeholder="Search Chinese, pinyin or English"  aria-label="Search vocabulary">
     <button type="button" id="toggleEn" aria-pressed="false">Hide English</button>
   </div>
   <div class="words" id="wordList"></div>
@@ -220,7 +231,7 @@ const SUPABASE_URL="https://cfljidsexwvhalvvlbxi.supabase.co";
 const SUPABASE_KEY="sb_publishable_kxC0kvIBXsHCeXVf6yosbg_b-nAEO6N";
 const TIME_LIMIT=10000;
 
-const D=[
+const ZH=[
 ["Dialogue 10",[["呀","ya","particle to soften questions"],["进","jìn","to enter"],["快","kuài","fast, quick"],["来","lái","to come"],["进来","jìn lai","to come in"],["介绍","jièshào","to introduce"],["一下","yí xià","once, a bit"],["高兴","gāoxìng","happy"],["漂亮","piàoliang","pretty, beautiful"],["坐","zuò","to sit"],["在","zài","at, in, on"],["哪儿 / 哪里","nǎr / nǎlǐ","where"],["学校","xuéxiào","school"],["喝","hē","to drink"],["点（儿）","diǎn(r)","a little, a bit"],["茶","chá","tea"],["咖啡","kāfēi","coffee"],["吧","ba","suggestion particle"],["要","yào","to want"],["瓶","píng","bottle"],["可乐","kělè","cola"],["可以","kěyǐ","can, may"],["对不起","duìbuqǐ","sorry"],["给","gěi","to give"],["杯","bēi","cup, glass"],["水","shuǐ","water"]]],
 ["Food",[["茶","chá","tea"],["咖啡","kāfēi","coffee"],["牛奶","niúnǎi","milk"],["水","shuǐ","water"],["汽水","qìshuǐ","fizzy drink"],["果汁","guǒzhī","fruit juice"],["酒","jiǔ","wine, alcohol"],["汤","tāng","soup"],["米饭","mǐfàn","rice (cooked)"],["面条","miàntiáo","noodles"],["面包","miànbāo","bread"],["牛肉","niúròu","beef"],["猪肉","zhūròu","pork"],["鸡肉","jīròu","chicken"],["鱼","yú","fish"],["海鲜","hǎixiān","seafood"],["饺子","jiǎozi","dumplings"],["鸡蛋","jīdàn","egg"],["肉","ròu","meat"],["鸭肉","yāròu","duck"],["烤","kǎo","roast; to roast"],["蔬菜 / 青菜","shūcài / qīngcài","vegetables"],["蛋糕","dàngāo","cake"],["水果","shuǐguǒ","fruit"],["早饭","zǎofàn","breakfast"],["午饭","wǔfàn","lunch"],["晚饭","wǎnfàn","dinner"],["点心","diǎnxīn","snack; dim sum"],["菜单","càidān","menu"],["饭馆","fànguǎn","restaurant"],["咖啡厅","kāfēitīng","café"],["点","diǎn","to order (food)"],["做饭","zuòfàn","to cook"],["筷子","kuàizi","chopsticks"]]],
 ["Dialogue 9",[["小","xiǎo","small"],["好久","hǎo jiǔ","a long time"],["不错","bú cuò","not bad"],["错","cuò","wrong"],["想","xiǎng","to want to, would like to"],["觉得","juéde","to think, to feel"],["有意思","yǒu yìsi","interesting"],["意思","yìsi","meaning"],["只","zhǐ","only"],["睡觉","shuì jiào","to sleep"],["算了","suàn le","forget it, never mind"],["找","zhǎo","to look for"],["别（的）","bié (de)","other"],["别人","biérén","other people"]]],
@@ -242,6 +253,26 @@ const strip=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
 const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const fmt=n=>n.toLocaleString("en-GB");
 const store={get:k=>{try{return localStorage.getItem(k)}catch{return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch{}}};
+const DE=[
+["Greetings",[["Hallo","","hello"],["Guten Morgen","","good morning"],["Guten Tag","","good day, hello"],["Guten Abend","","good evening"],["Gute Nacht","","good night"],["Tschüss","","bye"],["Auf Wiedersehen","","goodbye"],["Bis später","","see you later"],["Danke","","thank you"],["Bitte","","please; you're welcome"],["Entschuldigung","","excuse me, sorry"],["Ja","","yes"],["Nein","","no"],["Wie geht's?","","how are you?"],["Gut, danke","","fine, thanks"],["Ich heiße …","","my name is …"],["Wie heißt du?","","what's your name?"],["Freut mich","","nice to meet you"],["Woher kommst du?","","where are you from?"],["Ich komme aus England","","I come from England"]]],
+["Family",[["die Familie","","family"],["die Mutter","","mother"],["der Vater","","father"],["die Eltern","","parents"],["der Bruder","","brother"],["die Schwester","","sister"],["der Sohn","","son"],["die Tochter","","daughter"],["das Kind","","child"],["die Oma","","grandma"],["der Opa","","grandad"],["der Mann","","man; husband"],["die Frau","","woman; wife"],["der Freund","","friend (male); boyfriend"],["die Freundin","","friend (female); girlfriend"],["verheiratet","","married"]]],
+["Numbers",[["null","","zero"],["eins","","one"],["zwei","","two"],["drei","","three"],["vier","","four"],["fünf","","five"],["sechs","","six"],["sieben","","seven"],["acht","","eight"],["neun","","nine"],["zehn","","ten"],["elf","","eleven"],["zwölf","","twelve"],["zwanzig","","twenty"],["dreißig","","thirty"],["hundert","","hundred"],["tausend","","thousand"]]],
+["Days and time",[["Montag","","Monday"],["Dienstag","","Tuesday"],["Mittwoch","","Wednesday"],["Donnerstag","","Thursday"],["Freitag","","Friday"],["Samstag","","Saturday"],["Sonntag","","Sunday"],["heute","","today"],["morgen","","tomorrow"],["gestern","","yesterday"],["die Woche","","week"],["das Wochenende","","weekend"],["der Monat","","month"],["das Jahr","","year"],["die Uhr","","clock; o'clock"],["Wie spät ist es?","","what time is it?"],["jetzt","","now"],["später","","later"],["der Geburtstag","","birthday"]]],
+["Food and drink",[["das Wasser","","water"],["der Kaffee","","coffee"],["der Tee","","tea"],["die Milch","","milk"],["das Bier","","beer"],["der Wein","","wine"],["der Saft","","juice"],["das Brot","","bread"],["das Brötchen","","bread roll"],["der Käse","","cheese"],["das Fleisch","","meat"],["das Hähnchen","","chicken"],["der Fisch","","fish"],["das Ei","","egg"],["das Gemüse","","vegetables"],["das Obst","","fruit"],["der Apfel","","apple"],["die Kartoffel","","potato"],["der Kuchen","","cake"],["das Frühstück","","breakfast"],["das Mittagessen","","lunch"],["das Abendessen","","dinner"],["die Speisekarte","","menu"],["die Rechnung","","the bill"],["lecker","","tasty"]]],
+["Hobbies",[["das Hobby","","hobby"],["spielen","","to play"],["Fußball spielen","","to play football"],["lesen","","to read"],["das Buch","","book"],["schwimmen","","to swim"],["tanzen","","to dance"],["singen","","to sing"],["die Musik","","music"],["hören","","to listen, to hear"],["der Film","","film"],["fernsehen","","to watch TV"],["kochen","","to cook"],["reisen","","to travel"],["gern","","gladly (ich spiele gern = I like playing)"],["oft","","often"],["manchmal","","sometimes"],["nie","","never"]]],
+["Everyday verbs",[["sein","","to be"],["haben","","to have"],["gehen","","to go (on foot)"],["fahren","","to drive, to travel"],["kommen","","to come"],["machen","","to do, to make"],["essen","","to eat"],["trinken","","to drink"],["schlafen","","to sleep"],["arbeiten","","to work"],["wohnen","","to live (reside)"],["sprechen","","to speak"],["sehen","","to see"],["kaufen","","to buy"],["möchten","","would like"],["können","","can, to be able to"],["wollen","","to want"],["verstehen","","to understand"]]],
+["Getting around",[["der Bahnhof","","train station"],["der Zug","","train"],["der Bus","","bus"],["das Auto","","car"],["der Flughafen","","airport"],["die Straße","","street"],["links","","left"],["rechts","","right"],["geradeaus","","straight on"],["hier","","here"],["dort","","there"],["Wo ist …?","","where is …?"],["die Toilette","","toilet"],["das Hotel","","hotel"],["die Fahrkarte","","ticket"],["Wie viel kostet das?","","how much does that cost?"],["teuer","","expensive"],["billig","","cheap"]]]
+];
+
+const LANG={
+  zh:{data:ZH,title:"Mandarin flashcards",doc:"Mandarin Flashcards",first:"Chinese first",search:"Search Chinese, pinyin or English",cls:"zh",tag:"zh-CN",key:n=>n,nameKey:"mandarin-name"},
+  de:{data:DE,title:"German flashcards",doc:"German Flashcards",first:"German first",search:"Search German or English",cls:"de",tag:"de",key:n=>"de:"+n,nameKey:"mandarin-name"}
+};
+let lang=store.get("flash-lang")==="de"?"de":"zh";
+let D=LANG[lang].data;
+const L=()=>LANG[lang];
+const fw=(w,cls="")=>`<span class="${cls} ${L().cls}" lang="${L().tag}">${esc(w[0])}</span>`;
+const pyOf=w=>w[1]?`<span class="py">${esc(w[1])}</span>`:"";
 const words=name=>{const seen=new Set();return D.find(d=>d[0]===name)[1].filter(w=>{const k=w[0]+"|"+w[2];if(seen.has(k))return false;seen.add(k);return true})};
 
 let scores=[],scoresError=false,current=null,lastSavedId=null;
@@ -262,7 +293,7 @@ async function loadScores(){
   catch{scoresError=true}
 }
 
-const boardFor=lesson=>scores.filter(s=>s.lesson===lesson);
+const boardFor=lesson=>scores.filter(s=>s.lesson===L().key(lesson));
 
 function renderHome(){
   const wins={};
@@ -292,6 +323,17 @@ function openLesson(name){
   show("lesson");
 }
 
+function setLang(l){
+  lang=l;D=LANG[l].data;store.set("flash-lang",l);
+  document.querySelectorAll("[data-lang]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.lang===l));
+  $("homeTitle").textContent=L().title;
+  document.title=L().doc;
+  $("dirTarget").textContent=L().first;
+  $("q").placeholder=L().search;
+  renderHome();
+}
+document.querySelectorAll("[data-lang]").forEach(b=>b.addEventListener("click",()=>setLang(b.dataset.lang)));
+
 $("lessonList").addEventListener("click",e=>{const b=e.target.closest("[data-lesson]");if(b)openLesson(b.dataset.lesson)});
 document.querySelectorAll("[data-home]").forEach(b=>b.addEventListener("click",()=>{renderHome();show("home")}));
 
@@ -313,9 +355,9 @@ function nextQuestion(){
   $("qNum").textContent=`${G.i+1} of ${G.questions.length}`;
   $("gScore").textContent=fmt(G.score);
   $("qCard").innerHTML=dir==="zh"
-    ?`<span class="ask">What does this mean?</span><div class="word zh" lang="zh-CN">${esc(w[0])}</div><div class="py">${esc(w[1])}</div>`
+    ?`<span class="ask">What does this mean?</span><div class="word ${L().cls}" lang="${L().tag}">${esc(w[0])}</div>${w[1]?`<div class="py">${esc(w[1])}</div>`:""}`
     :`<span class="ask">How do you say</span><div class="word">${esc(w[2])}</div>`;
-  $("options").innerHTML=opts.map(o=>`<button type="button" data-key="${esc(o[0]+"|"+o[2])}">${dir==="zh"?esc(o[2]):`<span class="zh" lang="zh-CN">${esc(o[0])}</span><span class="opt-py">${esc(o[1])}</span>`}</button>`).join("");
+  $("options").innerHTML=opts.map(o=>`<button type="button" data-key="${esc(o[0]+"|"+o[2])}">${dir==="zh"?esc(o[2]):`${fw(o)}${o[1]?`<span class="opt-py">${esc(o[1])}</span>`:""}`}</button>`).join("");
   G.answer=w[0]+"|"+w[2];
   G.locked=false;
   G.start=performance.now();
@@ -372,7 +414,7 @@ $("nameForm").addEventListener("submit",async e=>{
   $("saveBtn").disabled=true;
   $("saveBtn").textContent="Saving";
   try{
-    const [row]=await api("scores",{method:"POST",headers:{Prefer:"return=representation"},body:JSON.stringify({lesson:G.lesson,name,score:G.score,correct:G.correct,total:G.questions.length})});
+    const [row]=await api("scores",{method:"POST",headers:{Prefer:"return=representation"},body:JSON.stringify({lesson:L().key(G.lesson),name,score:G.score,correct:G.correct,total:G.questions.length})});
     store.set("mandarin-name",name);
     lastSavedId=row.id;
     await loadScores();
@@ -409,8 +451,9 @@ function drawPractice(){
     return;
   }
   const [zh,py,en]=deck[0];
-  const front=pDir==="zh"?`<div class="word zh" lang="zh-CN">${esc(zh)}</div><div class="py">${esc(py)}</div>`:`<div class="word">${esc(en)}</div>`;
-  const back=pDir==="zh"?`<div class="en">${esc(en)}</div>`:`<div class="zh" lang="zh-CN">${esc(zh)}</div><div class="py">${esc(py)}</div>`;
+  const tgt=cls=>`<div class="${cls} ${L().cls}" lang="${L().tag}">${esc(zh)}</div>${py?`<div class="py">${esc(py)}</div>`:""}`;
+  const front=pDir==="zh"?tgt("word"):`<div class="word">${esc(en)}</div>`;
+  const back=pDir==="zh"?`<div class="en">${esc(en)}</div>`:tgt("");
   $("pCard").innerHTML=front+(flipped?`<div class="reveal">${back}</div>`:`<span class="hint">Tap to reveal</span>`);
 }
 function pGrade(ok){
@@ -438,7 +481,7 @@ function renderWords(){
   for(const [name,list] of D){
     const rows=list.filter(w=>!term||w.some(x=>strip(x).includes(term)));
     if(!rows.length)continue;
-    html+=`<section><h2>${esc(name)}<span>${rows.length} words</span></h2>${rows.map(([z,p,e])=>`<div class="w"><span class="zh" lang="zh-CN">${esc(z)}</span><span class="py">${esc(p)}</span><span class="en">${esc(e)}</span></div>`).join("")}</section>`;
+    html+=`<section><h2>${esc(name)}<span>${rows.length} words</span></h2>${rows.map(w=>`<div class="w">${fw(w)}${pyOf(w)}<span class="en">${esc(w[2])}</span></div>`).join("")}</section>`;
   }
   $("wordList").innerHTML=html||`<p class="sub">No words match “${esc($("q").value)}”.</p>`;
 }
@@ -458,7 +501,7 @@ document.addEventListener("visibilitychange",async()=>{
   }
 });
 
-renderHome();
+setLang(lang);
 loadScores().then(renderHome);
 </script>
 </body>
