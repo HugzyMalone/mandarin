@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mandarin Flashcards</title>
+<meta name="description" content="Mandarin vocab flashcards with a leaderboard for every lesson.">
+<meta name="theme-color" content="#2f6f5e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Mandarin">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;700;800&family=Noto+Serif+SC:wght@500;700&display=swap">
+<style>
+:root{--bg:#f6f8f7;--surface:#fff;--ink:#1b2320;--muted:#5d6b66;--line:#dde4e1;--accent:#2f6f5e;--accent-soft:#e3efeb;--bad:#a8572b;--bad-soft:#f6e9e1;--gold:#9a7412;--gold-soft:#f7efd9;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121816;--surface:#19211e;--ink:#e6ece9;--muted:#93a39d;--line:#2a3531;--accent:#7cc3ad;--accent-soft:#1f2e29;--bad:#e39a72;--bad-soft:#2e231d;--gold:#e0bd5c;--gold-soft:#2c2718;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121816;--surface:#19211e;--ink:#e6ece9;--muted:#93a39d;--line:#2a3531;--accent:#7cc3ad;--accent-soft:#1f2e29;--bad:#e39a72;--bad-soft:#2e231d;--gold:#e0bd5c;--gold-soft:#2c2718;color-scheme:dark}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Figtree,system-ui,sans-serif;padding:calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 32px);-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+.view{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+button,input{font:inherit;color:inherit}
+button{touch-action:manipulation;cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 16px;font-weight:600;min-height:48px}
+button:active{transform:scale(.98)}
+button:focus-visible,input:focus-visible,.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.primary{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:800}
+.big-btn{width:100%;font-size:1.1rem;min-height:58px}
+.zh{font-family:"Noto Serif SC","Songti SC",serif}
+h1{font-size:1.9rem;line-height:1.15;margin:0;font-weight:800;text-wrap:balance}
+h2{font-size:1.1rem;margin:0}
+.sub{color:var(--muted);margin:4px 0 0}
+.label{font-size:.75rem;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin:0 0 8px}
+.top{display:flex;align-items:center;gap:10px}
+.icon-btn{min-width:48px;padding:0;display:grid;place-items:center;flex:none}
+.icon-btn svg{width:22px;height:22px}
+.top .grow{flex:1;min-width:0}
+.standings{display:flex;gap:10px}
+.standings>div{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;min-width:0}
+.standings .n{font-size:1.6rem;font-weight:800;font-variant-numeric:tabular-nums}
+.standings .who{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.standings .lead{border-color:var(--gold);background:var(--gold-soft)}
+.lessons{display:flex;flex-direction:column;gap:10px}
+.lesson{display:flex;align-items:center;gap:12px;text-align:left;width:100%;padding:14px 16px;border-radius:14px}
+.lesson .grow{flex:1;min-width:0}
+.lesson .name{font-weight:700;font-size:1.05rem}
+.lesson .meta{color:var(--muted);font-size:.85rem;font-weight:500}
+.lesson .best{text-align:right;font-size:.85rem;font-weight:500;color:var(--muted);flex:none}
+.lesson .best b{display:block;color:var(--gold);font-size:1rem;font-variant-numeric:tabular-nums}
+.chev{width:18px;height:18px;color:var(--muted);flex:none}
+.board{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.board ol{list-style:none;margin:0;padding:0}
+.board li{display:grid;grid-template-columns:32px 1fr auto;gap:4px 10px;align-items:baseline;padding:12px 14px;border-bottom:1px solid var(--line)}
+.board li:last-child{border-bottom:0}
+.board .rank{font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
+.board li:first-child .rank{color:var(--gold)}
+.board .nm{font-weight:700;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.board .pts{font-weight:800;font-variant-numeric:tabular-nums;text-align:right}
+.board .det{grid-column:2/4;color:var(--muted);font-size:.8rem}
+.board li.me{background:var(--gold-soft)}
+.board .empty{padding:18px 14px;color:var(--muted)}
+.hud{display:flex;justify-content:space-between;align-items:center;gap:10px;font-variant-numeric:tabular-nums}
+.hud .score{font-weight:800;font-size:1.3rem}
+.hud .q{color:var(--muted);font-weight:600}
+.timer{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.timer i{display:block;height:100%;width:100%;background:var(--accent);transform-origin:left}
+.card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:28px 18px;min-height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;box-shadow:0 6px 24px rgb(0 0 0 / .06)}
+.card .ask{font-size:.75rem;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase}
+.card .word{font-size:clamp(1.5rem,7vw,2.1rem);font-weight:800;text-wrap:balance}
+.card .word.zh{font-size:clamp(3rem,16vw,4.6rem);font-weight:500;line-height:1.15}
+.card .py{color:var(--accent);font-size:1.25rem}
+.card .hint{color:var(--muted);font-size:.85rem;margin-top:6px}
+.card .reveal{margin-top:10px;padding-top:12px;border-top:1px solid var(--line);min-width:60%;display:flex;flex-direction:column;gap:2px}
+.card .reveal .en{font-size:1.2rem;font-weight:600}
+.card .reveal .zh{font-size:2.4rem}
+.pop{position:absolute;top:12px;right:14px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;animation:pop .7s ease-out}
+.pop.miss{color:var(--bad)}
+@keyframes pop{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+.options{display:flex;flex-direction:column;gap:10px}
+.options button{min-height:60px;text-align:left;padding:10px 16px;font-size:1.05rem;display:flex;flex-direction:column;justify-content:center;border-radius:14px}
+.options .zh{font-size:1.6rem;font-weight:500;line-height:1.2}
+.options .opt-py{font-size:.85rem;color:var(--muted);font-weight:500}
+.options button.right{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.options button.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.options button:disabled{cursor:default}
+.options button:disabled:not(.right):not(.wrong){opacity:.55}
+.row{display:flex;gap:10px}
+.row>button{flex:1}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+.progress{display:flex;justify-content:space-between;color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums;margin-bottom:6px}
+.again{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.gotit{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.result{text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:28px 18px;display:flex;flex-direction:column;gap:6px;align-items:center}
+.result .final{font-size:3.4rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.result .rankline{font-weight:700;color:var(--gold)}
+.arcade{display:flex;flex-direction:column;gap:10px}
+.arcade input{width:100%;font-size:1.6rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;text-align:center;padding:14px;border:2px solid var(--accent);border-radius:14px;background:var(--surface)}
+.arcade input::placeholder{letter-spacing:.06em;font-weight:600;color:var(--muted);text-transform:none}
+.msg{color:var(--bad);font-size:.9rem;text-align:center;margin:0}
+.search{position:sticky;top:0;z-index:2;background:var(--bg);padding:calc(env(safe-area-inset-top) + 8px) 0 8px;margin-top:calc(-1 * env(safe-area-inset-top));display:flex;gap:10px}
+.search input{flex:1;min-width:0;font-size:16px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.words section{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.words h2{display:flex;justify-content:space-between;align-items:baseline;padding:12px 14px;border-bottom:1px solid var(--line)}
+.words h2 span{font-size:.75rem;font-weight:600;color:var(--muted)}
+.w{display:grid;grid-template-columns:auto 1fr;gap:0 12px;padding:10px 14px;border-bottom:1px solid var(--line)}
+.w:last-child{border-bottom:0}
+.w .zh{font-size:1.35rem;grid-row:span 2;align-self:center;min-width:3.2em}
+.w .py{color:var(--accent);font-size:.9rem}
+.hide-en .w .en{color:transparent;background:var(--accent-soft);border-radius:4px}
+.words{display:flex;flex-direction:column;gap:14px}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+</svg>
+
+<main class="view" id="home">
+  <div>
+    <h1>Mandarin flashcards</h1>
+    <p class="sub">Pick a lesson, play for points, put your name on the board.</p>
+  </div>
+  <div>
+    <p class="label">Lessons won</p>
+    <div class="standings" id="standings"></div>
+  </div>
+  <div>
+    <p class="label">Lessons</p>
+    <div class="lessons" id="lessonList"></div>
+  </div>
+  <button type="button" class="big-btn" id="openWords">Full word list</button>
+</main>
+
+<main class="view" id="lesson" hidden>
+  <div class="top">
+    <button type="button" class="icon-btn" data-home aria-label="Back to lessons"><svg><use href="#i-back"/></svg></button>
+    <div class="grow"><h1 id="lessonTitle"></h1><p class="sub" id="lessonMeta"></p></div>
+  </div>
+  <button type="button" class="primary big-btn" id="play">Play for score</button>
+  <button type="button" class="big-btn" id="practise">Practise (no score)</button>
+  <div>
+    <p class="label">Leaderboard</p>
+    <div class="board" id="board"></div>
+  </div>
+</main>
+
+<main class="view" id="game" hidden>
+  <div class="top">
+    <button type="button" class="icon-btn" id="quit" aria-label="Quit this round"><svg><use href="#i-x"/></svg></button>
+    <div class="grow hud"><span class="q" id="qNum"></span><span class="score" id="gScore">0</span></div>
+  </div>
+  <div class="timer"><i id="timerFill"></i></div>
+  <div class="card" id="qCard" aria-live="polite"></div>
+  <div class="options" id="options"></div>
+</main>
+
+<main class="view" id="result" hidden>
+  <div class="result">
+    <p class="label" id="rLesson"></p>
+    <div class="final" id="rScore"></div>
+    <p class="sub" id="rDetail"></p>
+    <p class="rankline" id="rRank"></p>
+  </div>
+  <form class="arcade" id="nameForm">
+    <p class="label" style="text-align:center;margin:0">Enter your name</p>
+    <input id="nameInput" maxlength="12" autocomplete="nickname" autocapitalize="characters" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="Your name" required>
+    <button type="submit" class="primary big-btn" id="saveBtn">Save to leaderboard</button>
+    <p class="msg" id="saveMsg" hidden></p>
+  </form>
+  <div class="row">
+    <button type="button" id="replay">Play again</button>
+    <button type="button" id="skipSave">Don't save</button>
+  </div>
+</main>
+
+<main class="view" id="practice" hidden>
+  <div class="top">
+    <button type="button" class="icon-btn" id="endPractice" aria-label="Back to lesson"><svg><use href="#i-back"/></svg></button>
+    <div class="grow"><h2 id="pTitle"></h2></div>
+  </div>
+  <div class="row seg">
+    <button type="button" data-dir="zh" aria-pressed="true">Chinese first</button>
+    <button type="button" data-dir="en" aria-pressed="false">English first</button>
+  </div>
+  <div>
+    <div class="progress"><span id="pLeft"></span><span id="pKnown"></span></div>
+    <div class="bar"><i id="pBar"></i></div>
+  </div>
+  <div class="card" id="pCard" role="button" tabindex="0" aria-label="Flip card"></div>
+  <div class="row" id="pGrade">
+    <button type="button" class="again" id="pAgain">Again</button>
+    <button type="button" class="gotit" id="pGot">Got it</button>
+  </div>
+</main>
+
+<main class="view" id="words" hidden>
+  <div class="top">
+    <button type="button" class="icon-btn" data-home aria-label="Back to lessons"><svg><use href="#i-back"/></svg></button>
+    <div class="grow"><h1>Word list</h1></div>
+  </div>
+  <div class="search">
+    <input id="q" type="search" placeholder="Search Chinese, pinyin or English" aria-label="Search vocabulary">
+    <button type="button" id="toggleEn" aria-pressed="false">Hide English</button>
+  </div>
+  <div class="words" id="wordList"></div>
+</main>
+
+<script>
+const SUPABASE_URL="https://cfljidsexwvhalvvlbxi.supabase.co";
+const SUPABASE_KEY="sb_publishable_kxC0kvIBXsHCeXVf6yosbg_b-nAEO6N";
+const TIME_LIMIT=10000;
+
+const D=[
+["Dialogue 10",[["呀","ya","particle to soften questions"],["进","jìn","to enter"],["快","kuài","fast, quick"],["来","lái","to come"],["进来","jìn lai","to come in"],["介绍","jièshào","to introduce"],["一下","yí xià","once, a bit"],["高兴","gāoxìng","happy"],["漂亮","piàoliang","pretty, beautiful"],["坐","zuò","to sit"],["在","zài","at, in, on"],["哪儿 / 哪里","nǎr / nǎlǐ","where"],["学校","xuéxiào","school"],["喝","hē","to drink"],["点（儿）","diǎn(r)","a little, a bit"],["茶","chá","tea"],["咖啡","kāfēi","coffee"],["吧","ba","suggestion particle"],["要","yào","to want"],["瓶","píng","bottle"],["可乐","kělè","cola"],["可以","kěyǐ","can, may"],["对不起","duìbuqǐ","sorry"],["给","gěi","to give"],["杯","bēi","cup, glass"],["水","shuǐ","water"]]],
+["Food",[["茶","chá","tea"],["咖啡","kāfēi","coffee"],["牛奶","niúnǎi","milk"],["水","shuǐ","water"],["汽水","qìshuǐ","fizzy drink"],["果汁","guǒzhī","fruit juice"],["酒","jiǔ","wine, alcohol"],["汤","tāng","soup"],["米饭","mǐfàn","rice (cooked)"],["面条","miàntiáo","noodles"],["面包","miànbāo","bread"],["牛肉","niúròu","beef"],["猪肉","zhūròu","pork"],["鸡肉","jīròu","chicken"],["鱼","yú","fish"],["海鲜","hǎixiān","seafood"],["饺子","jiǎozi","dumplings"],["鸡蛋","jīdàn","egg"],["肉","ròu","meat"],["鸭肉","yāròu","duck"],["烤","kǎo","roast; to roast"],["蔬菜 / 青菜","shūcài / qīngcài","vegetables"],["蛋糕","dàngāo","cake"],["水果","shuǐguǒ","fruit"],["早饭","zǎofàn","breakfast"],["午饭","wǔfàn","lunch"],["晚饭","wǎnfàn","dinner"],["点心","diǎnxīn","snack; dim sum"],["菜单","càidān","menu"],["饭馆","fànguǎn","restaurant"],["咖啡厅","kāfēitīng","café"],["点","diǎn","to order (food)"],["做饭","zuòfàn","to cook"],["筷子","kuàizi","chopsticks"]]],
+["Dialogue 9",[["小","xiǎo","small"],["好久","hǎo jiǔ","a long time"],["不错","bú cuò","not bad"],["错","cuò","wrong"],["想","xiǎng","to want to, would like to"],["觉得","juéde","to think, to feel"],["有意思","yǒu yìsi","interesting"],["意思","yìsi","meaning"],["只","zhǐ","only"],["睡觉","shuì jiào","to sleep"],["算了","suàn le","forget it, never mind"],["找","zhǎo","to look for"],["别（的）","bié (de)","other"],["别人","biérén","other people"]]],
+["Dialogue 8",[["爱好","àihào","hobbies"],["周末","zhōumò","weekend"],["打篮球","dǎ lánqiú","to play basketball"],["打","dǎ","to hit"],["球","qiú","ball"],["看","kàn","to watch, look, read"],["电视","diànshì","television"],["唱歌（儿）","chàng gē(r)","to sing (a song)"],["唱","chàng","to sing"],["歌","gē","song"],["跳舞","tiào wǔ","to dance"],["听","tīng","to listen"],["音乐","yīnyuè","music"],["书","shū","book"],["对","duì","right, correct"],["有的时候","yǒude shíhou","sometimes"],["电影","diànyǐng","film"],["常常","chángcháng","often"],["那","nà","in that case, then"],["去","qù","to go"],["外国","wàiguó","foreign country"],["请客","qǐng kè","to invite someone, to play the host"],["昨天","zuótiān","yesterday"],["所以","suǒyǐ","so, therefore"]]],
+["Dialogue 7",[["现在","xiànzài","now"],["事（儿）","shì(r)","matter, affair, event"],["今天","jīntiān","today"],["忙","máng","busy"],["明天","míngtiān","tomorrow"],["晚饭","wǎnfàn","dinner"],["为什么","wèishénme","why"],["因为","yīnwèi","because"],["还","hái","also, too"],["同学","tóngxué","classmate"],["认识","rènshi","to know"],["朋友","péngyou","friend"]]],
+["Dialogue 6",[["月","yuè","month, moon"],["日","rì","day, sun"],["号","hào","date of a month"],["几","jǐ","how many"],["今天","jīntiān","today"],["昨天","zuótiān","yesterday"],["明天","míngtiān","tomorrow"],["星期","xīngqī","week"],["星期一","xīngqī yī","Monday"],["星期二","xīngqī èr","Tuesday"],["星期三","xīngqī sān","Wednesday"],["星期四","xīngqī sì","Thursday"],["星期五","xīngqī wǔ","Friday"],["星期六","xīngqī liù","Saturday"],["星期天 / 星期日","xīngqī tiān / xīngqī rì","Sunday"],["天","tiān","day"],["生日","shēngrì","birthday"],["生","shēng","to give birth, to be born"],["年","nián","year"],["今年","jīnnián","this year"],["大","dà","big"],["岁","suì","year of age"],["吃","chī","to eat"],["饭","fàn","meal, rice"],["怎么样？","zěnmeyàng?","How does that sound?"],["喜欢","xǐhuan","to like"],["菜","cài","dish, cuisine"],["还是","háishi","or"],["可是","kěshì","but"],["点","diǎn","o’clock"],["半","bàn","half"],["晚上","wǎnshang","evening"],["见","jiàn","to see"],["再见","zàijiàn","goodbye"],["谢谢","xièxie","thank you"]]],
+["Dialogue 5",[["家","jiā","family, home"],["几","jǐ","how many"],["口","kǒu","measure word (family members)"],["两","liǎng","two"],["和","hé","and"],["做","zuò","to do"],["工作","gōngzuò","job, to work"],["律师","lǜshī","lawyer"],["英文","yīngwén","English language"],["都","dōu","both, all"],["大学生","dàxuéshēng","university student"],["大学","dàxué","university"],["医生","yīshēng","doctor"]]],
+["Lesson 4 grammar",[["妈妈","māma","mum"],["爸爸","bàba","dad"],["哥哥","gēge","older brother"],["弟弟","dìdi","younger brother"],["姐姐","jiějie","older sister"],["妹妹","mèimei","younger sister"]]],
+["Nationalities",[["中国","Zhōngguó","China"],["德国","Déguó","Germany"],["美国","Měiguó","United States"],["法国","Fǎguó","France"],["西班牙","Xībānyá","Spain"],["意大利","Yìdàlì","Italy"],["英国","Yīngguó","United Kingdom"],["伦敦","Lúndūn","London"]]],
+["Lesson 4",[["那","nà","that"],["这","zhè","this"],["的","de","possessive particle"],["照片","zhàopiàn","picture, photo"],["个","gè","measure word"],["女","nǚ","female"],["孩子","háizi","child"],["谁","shéi","who"],["男","nán","male"],["儿子","érzi","son"],["有","yǒu","to have"],["女儿","nǚ’ér","daughter"],["没","méi","not"]]],
+["Lesson 3",[["不","bù","negator (not, no)"],["也","yě","also"],["人","rén","person"],["北京","Běijīng","Beijing"],["伦敦","Lúndūn","London"],["再见","zàijiàn","goodbye"]]],
+["Lesson 2",[["他","tā","he"],["她","tā","she"],["们","men","pluraliser"],["老师","lǎoshī","teacher"],["学生","xuéshēng","student"],["是","shì","to be"],["中文","zhōngwén","Chinese language"],["吗","ma","question particle"]]],
+["Lesson 1",[["你好","nǐ hǎo","hello"],["你","nǐ","you"],["我","wǒ","me"],["叫","jiào","to be called"],["高兴","gāoxìng","happy"],["认识","rènshi","to meet"],["很","hěn","very"],["您","nín","you (respectful)"],["请问","qǐngwèn","excuse me, may I ask"],["贵姓","guì xìng","honourable surname (what is your surname?)"],["王","Wáng","Wang (surname)"],["先生","xiānsheng","Mr"],["李","Lǐ","Li (surname)"],["小姐","xiǎojiě","Miss"],["什么","shénme","what"],["呢","ne","question word"],["你呢？","nǐ ne?","what about you?"]]]
+];
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const strip=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const fmt=n=>n.toLocaleString("en-GB");
+const store={get:k=>{try{return localStorage.getItem(k)}catch{return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch{}}};
+const words=name=>{const seen=new Set();return D.find(d=>d[0]===name)[1].filter(w=>{const k=w[0]+"|"+w[2];if(seen.has(k))return false;seen.add(k);return true})};
+
+let scores=[],scoresError=false,current=null,lastSavedId=null;
+
+function show(id){
+  document.querySelectorAll("main.view").forEach(v=>v.hidden=v.id!==id);
+  window.scrollTo(0,0);
+}
+
+async function api(path,opts={}){
+  const res=await fetch(`${SUPABASE_URL}/rest/v1/${path}`,{...opts,headers:{apikey:SUPABASE_KEY,"Content-Type":"application/json",...opts.headers}});
+  if(!res.ok)throw new Error(`${res.status}`);
+  return res.status===204?null:res.json();
+}
+
+async function loadScores(){
+  try{scores=await api("scores?select=id,lesson,name,score,correct,total,created_at&order=score.desc,created_at.asc&limit=5000");scoresError=false}
+  catch{scoresError=true}
+}
+
+const boardFor=lesson=>scores.filter(s=>s.lesson===lesson);
+
+function renderHome(){
+  const wins={};
+  for(const [name] of D){const top=boardFor(name)[0];if(top)wins[top.name]=(wins[top.name]||0)+1}
+  const ranked=Object.entries(wins).sort((a,b)=>b[1]-a[1]);
+  $("standings").innerHTML=scoresError?`<div><div class="who">Scores could not load</div><div class="sub">Check your connection and reopen.</div></div>`:
+    ranked.length?ranked.slice(0,3).map(([n,c],i)=>`<div class="${i===0&&c>(ranked[1]?.[1]||0)?"lead":""}"><div class="n">${c}</div><div class="who">${esc(n)}</div></div>`).join(""):
+    `<div><div class="who">No scores yet</div><div class="sub">Play a lesson to claim it.</div></div>`;
+  $("lessonList").innerHTML=D.map(([name])=>{
+    const top=boardFor(name)[0];
+    return `<button type="button" class="lesson" data-lesson="${esc(name)}"><div class="grow"><div class="name">${esc(name)}</div><div class="meta">${words(name).length} words</div></div><div class="best">${top?`<b>${fmt(top.score)}</b>${esc(top.name)}`:"Unclaimed"}</div><svg class="chev"><use href="#i-next"/></svg></button>`;
+  }).join("");
+}
+
+function renderBoard(lesson){
+  const rows=boardFor(lesson).slice(0,10);
+  if(scoresError){$("board").innerHTML=`<p class="empty">Scores could not load. Check your connection.</p>`;return}
+  $("board").innerHTML=rows.length?`<ol>${rows.map((s,i)=>`<li class="${s.id===lastSavedId?"me":""}"><span class="rank">${i+1}</span><span class="nm">${esc(s.name)}</span><span class="pts">${fmt(s.score)}</span><span class="det">${s.correct} of ${s.total} right · ${new Date(s.created_at).toLocaleDateString("en-GB",{day:"numeric",month:"short"})}</span></li>`).join("")}</ol>`:
+    `<p class="empty">No scores yet. First to play takes the top spot.</p>`;
+}
+
+function openLesson(name){
+  current=name;
+  $("lessonTitle").textContent=name;
+  $("lessonMeta").textContent=`${words(name).length} words`;
+  renderBoard(name);
+  show("lesson");
+}
+
+$("lessonList").addEventListener("click",e=>{const b=e.target.closest("[data-lesson]");if(b)openLesson(b.dataset.lesson)});
+document.querySelectorAll("[data-home]").forEach(b=>b.addEventListener("click",()=>{renderHome();show("home")}));
+
+let G=null,raf=0;
+
+function startGame(){
+  const pool=words(current);
+  G={lesson:current,pool,questions:shuffle([...pool]).map(w=>({w,dir:Math.random()<.5?"zh":"en"})),i:0,score:0,correct:0,locked:false,start:0};
+  show("game");
+  nextQuestion();
+}
+
+function nextQuestion(){
+  cancelAnimationFrame(raf);
+  if(G.i>=G.questions.length)return finishGame();
+  const {w,dir}=G.questions[G.i];
+  const others=shuffle(G.pool.filter(o=>o[0]!==w[0]&&o[2]!==w[2])).slice(0,3);
+  const opts=shuffle([w,...others]);
+  $("qNum").textContent=`${G.i+1} of ${G.questions.length}`;
+  $("gScore").textContent=fmt(G.score);
+  $("qCard").innerHTML=dir==="zh"
+    ?`<span class="ask">What does this mean?</span><div class="word zh" lang="zh-CN">${esc(w[0])}</div><div class="py">${esc(w[1])}</div>`
+    :`<span class="ask">How do you say</span><div class="word">${esc(w[2])}</div>`;
+  $("options").innerHTML=opts.map(o=>`<button type="button" data-key="${esc(o[0]+"|"+o[2])}">${dir==="zh"?esc(o[2]):`<span class="zh" lang="zh-CN">${esc(o[0])}</span><span class="opt-py">${esc(o[1])}</span>`}</button>`).join("");
+  G.answer=w[0]+"|"+w[2];
+  G.locked=false;
+  G.start=performance.now();
+  const tick=now=>{
+    const left=Math.max(0,1-(now-G.start)/TIME_LIMIT);
+    $("timerFill").style.transform=`scaleX(${left})`;
+    if(left<=0)return answer(null);
+    raf=requestAnimationFrame(tick);
+  };
+  raf=requestAnimationFrame(tick);
+}
+
+function answer(key){
+  if(G.locked)return;
+  G.locked=true;
+  cancelAnimationFrame(raf);
+  const left=Math.max(0,1-(performance.now()-G.start)/TIME_LIMIT);
+  const ok=key===G.answer;
+  const pts=ok?100+Math.round(100*left):0;
+  G.score+=pts;
+  if(ok)G.correct++;
+  $("gScore").textContent=fmt(G.score);
+  $("options").querySelectorAll("button").forEach(b=>{
+    b.disabled=true;
+    if(b.dataset.key===G.answer)b.classList.add("right");
+    else if(b.dataset.key===key)b.classList.add("wrong");
+  });
+  $("qCard").insertAdjacentHTML("beforeend",`<span class="pop ${ok?"":"miss"}">${ok?`+${pts}`:key===null?"Time up":"Miss"}</span>`);
+  G.i++;
+  setTimeout(()=>{if(G&&!$("game").hidden)nextQuestion()},ok?750:1600);
+}
+
+$("options").addEventListener("click",e=>{const b=e.target.closest("button");if(b&&G)answer(b.dataset.key)});
+$("quit").addEventListener("click",()=>{cancelAnimationFrame(raf);G=null;openLesson(current)});
+
+function finishGame(){
+  const board=boardFor(G.lesson);
+  const rank=board.filter(s=>s.score>G.score).length+1;
+  $("rLesson").textContent=G.lesson;
+  $("rScore").textContent=fmt(G.score);
+  $("rDetail").textContent=`${G.correct} of ${G.questions.length} right`;
+  $("rRank").textContent=rank===1?(board.length?"New top score":"First score on this lesson"):rank<=10?`That would be number ${rank} on the board`:"";
+  $("nameInput").value=store.get("mandarin-name")||"";
+  $("saveMsg").hidden=true;
+  $("saveBtn").disabled=false;
+  $("saveBtn").textContent="Save to leaderboard";
+  show("result");
+}
+
+$("nameForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const name=$("nameInput").value.trim().toUpperCase().slice(0,12);
+  if(!name||!G)return;
+  $("saveBtn").disabled=true;
+  $("saveBtn").textContent="Saving";
+  try{
+    const [row]=await api("scores",{method:"POST",headers:{Prefer:"return=representation"},body:JSON.stringify({lesson:G.lesson,name,score:G.score,correct:G.correct,total:G.questions.length})});
+    store.set("mandarin-name",name);
+    lastSavedId=row.id;
+    await loadScores();
+    G=null;
+    openLesson(current);
+  }catch{
+    $("saveMsg").textContent="Could not save. Check your connection and try again.";
+    $("saveMsg").hidden=false;
+    $("saveBtn").disabled=false;
+    $("saveBtn").textContent="Try again";
+  }
+});
+$("replay").addEventListener("click",startGame);
+$("skipSave").addEventListener("click",()=>{G=null;openLesson(current)});
+$("play").addEventListener("click",startGame);
+
+let P=null,pDir="zh";
+function startPractice(){
+  P={deck:shuffle(words(current).map(w=>[...w])),total:0,known:0,flipped:false};
+  P.total=P.deck.length;
+  $("pTitle").textContent=current;
+  show("practice");
+  drawPractice();
+}
+function drawPractice(){
+  const {deck,total,known,flipped}=P;
+  $("pLeft").textContent=`${deck.length} left`;
+  $("pKnown").textContent=`${known} of ${total} known`;
+  $("pBar").style.width=`${known/total*100}%`;
+  $("pGrade").hidden=!deck.length||!flipped;
+  if(!deck.length){
+    $("pCard").innerHTML=`<div class="word">All ${total} done</div><p class="hint">Ready to play this lesson for points?</p><button type="button" class="primary" id="pToGame">Play for score</button>`;
+    $("pToGame").addEventListener("click",e=>{e.stopPropagation();startGame()});
+    return;
+  }
+  const [zh,py,en]=deck[0];
+  const front=pDir==="zh"?`<div class="word zh" lang="zh-CN">${esc(zh)}</div><div class="py">${esc(py)}</div>`:`<div class="word">${esc(en)}</div>`;
+  const back=pDir==="zh"?`<div class="en">${esc(en)}</div>`:`<div class="zh" lang="zh-CN">${esc(zh)}</div><div class="py">${esc(py)}</div>`;
+  $("pCard").innerHTML=front+(flipped?`<div class="reveal">${back}</div>`:`<span class="hint">Tap to reveal</span>`);
+}
+function pGrade(ok){
+  if(!P.deck.length||!P.flipped)return;
+  const c=P.deck.shift();
+  if(ok)P.known++;else P.deck.splice(Math.min(P.deck.length,3+Math.floor(Math.random()*4)),0,c);
+  P.flipped=false;
+  drawPractice();
+}
+$("practise").addEventListener("click",startPractice);
+$("endPractice").addEventListener("click",()=>openLesson(current));
+$("pCard").addEventListener("click",()=>{if(P.deck.length){P.flipped=!P.flipped;drawPractice()}});
+$("pAgain").addEventListener("click",()=>pGrade(false));
+$("pGot").addEventListener("click",()=>pGrade(true));
+document.querySelectorAll("[data-dir]").forEach(b=>b.addEventListener("click",()=>{
+  pDir=b.dataset.dir;
+  document.querySelectorAll("[data-dir]").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  P.flipped=false;
+  drawPractice();
+}));
+
+function renderWords(){
+  const term=strip($("q").value.trim());
+  let html="";
+  for(const [name,list] of D){
+    const rows=list.filter(w=>!term||w.some(x=>strip(x).includes(term)));
+    if(!rows.length)continue;
+    html+=`<section><h2>${esc(name)}<span>${rows.length} words</span></h2>${rows.map(([z,p,e])=>`<div class="w"><span class="zh" lang="zh-CN">${esc(z)}</span><span class="py">${esc(p)}</span><span class="en">${esc(e)}</span></div>`).join("")}</section>`;
+  }
+  $("wordList").innerHTML=html||`<p class="sub">No words match “${esc($("q").value)}”.</p>`;
+}
+$("openWords").addEventListener("click",()=>{renderWords();show("words")});
+$("q").addEventListener("input",renderWords);
+$("toggleEn").addEventListener("click",e=>{
+  const on=e.currentTarget.getAttribute("aria-pressed")!=="true";
+  e.currentTarget.setAttribute("aria-pressed",on);
+  e.currentTarget.textContent=on?"Show English":"Hide English";
+  $("wordList").classList.toggle("hide-en",on);
+});
+
+document.addEventListener("visibilitychange",async()=>{
+  if(document.visibilityState==="visible"&&(!$("home").hidden||!$("lesson").hidden)){
+    await loadScores();
+    if(!$("home").hidden)renderHome();else renderBoard(current);
+  }
+});
+
+renderHome();
+loadScores().then(renderHome);
+</script>
+</body>
+</html>
