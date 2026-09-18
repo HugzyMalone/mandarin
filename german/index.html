@@ -468,7 +468,7 @@ function nextQuestion(){
   G.answer=w[0]+"|"+w[2];
   G.locked=false;
   G.start=performance.now();
-  G.limit=lang==="de"?8000:TIME_LIMIT;
+  G.limit=lang==="de"?12000:TIME_LIMIT;
   const tick=now=>{
     const left=Math.max(0,1-(now-G.start)/G.limit);
     $("timerFill").style.transform=`scaleX(${left})`;
