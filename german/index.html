@@ -330,6 +330,7 @@ h1{font-size:2.6rem;line-height:.98;text-wrap:balance}
 </main>
 
 <script src="../tracking.js?v=2" data-player="HUGZY"></script>
+<script src="../sounds.js?v=1"></script>
 <script>
 const SUPABASE_URL="https://cfljidsexwvhalvvlbxi.supabase.co";
 const SUPABASE_KEY="sb_publishable_kxC0kvIBXsHCeXVf6yosbg_b-nAEO6N";
@@ -1564,6 +1565,7 @@ function answer(key){
   cancelAnimationFrame(raf);
   const left=Math.max(0,1-(performance.now()-G.start)/G.limit);
   const ok=key===G.answer;
+  if(ok)window.FlashSounds?.correct();else if(key!==null)window.FlashSounds?.tap();
   Learning.record({name:G.player,language:lang,mode:"q",direction:G.questions[G.i].dir,word:G.questions[G.i].w,answer:key,correct:ok,elapsed:performance.now()-G.start});
   const pts=ok?100+Math.round(100*left):0;
   G.score+=pts;
@@ -1651,6 +1653,7 @@ function drawPractice(){
 function pGrade(ok){
   if(!P.deck.length||!P.flipped)return;
   const c=P.deck.shift();
+  if(ok)window.FlashSounds?.correct();else window.FlashSounds?.tap();
   Learning.record({name:P.player,language:lang,mode:"p",direction:pDir,word:c,answer:null,correct:ok,elapsed:performance.now()-P.started});
   P.started=performance.now();
   if(ok)P.known++;else P.deck.splice(Math.min(P.deck.length,3+Math.floor(Math.random()*4)),0,c);
