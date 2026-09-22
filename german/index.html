@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Mandarin Flashcards</title>
-<meta name="description" content="Mandarin vocab flashcards with a leaderboard for every lesson.">
+<title>German Flashcards</title>
+<meta name="description" content="Beginner German words and everyday phrases, with practice and lesson leaderboards.">
 <meta name="theme-color" content="#efece3" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0b110f" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -237,8 +237,8 @@ h1{font-size:2.6rem;line-height:.98;text-wrap:balance}
     </div>
   </header>
   <div>
-    <h1 id="homeTitle">Mandarin flashcards</h1>
-    <p class="sub">Pick a lesson, play for points, put your name on the board.</p>
+    <h1 id="homeTitle">German flashcards</h1>
+    <p class="sub">Start with everyday basics. Short lessons, simple phrases, and untimed practice whenever you need it.</p>
   </div>
   <section>
     <div class="sechead"><h2>Lessons won</h2><span>Top score holders</span></div>
@@ -352,27 +352,1061 @@ const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()
 const fmt=n=>n.toLocaleString("en-GB");
 const store={get:k=>{try{return localStorage.getItem(k)}catch{return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch{}}};
 const DE=[
-["Greetings",[["Hallo","","hi"],["Guten Morgen","","good morning"],["Guten Tag","","good afternoon (formal hello)"],["Guten Abend","","good evening"],["Gute Nacht","","good night"],["Tschüss","","bye"],["Auf Wiedersehen","","goodbye (formal)"],["Bis später","","see you later"],["Bis morgen","","see you tomorrow"],["Danke schön","","thank you very much"],["Bitte","","please"],["Gern geschehen","","you're welcome"],["Entschuldigung","","excuse me"],["Es tut mir leid","","I'm sorry"],["Wie geht es dir?","","how are you?"],["Mir geht es gut","","I'm fine"],["Und dir?","","and you?"],["Ich heiße Hugo","","my name is Hugo"],["Wie heißt du?","","what's your name?"],["Freut mich","","nice to meet you"],["Woher kommst du?","","where are you from?"],["Ich komme aus England","","I'm from England"],["Sprechen Sie Englisch?","","do you speak English?"],["Ich verstehe nicht","","I don't understand"],["Noch einmal, bitte","","again, please"]]],
-["Family",[["die Familie","","family"],["die Mutter","","mother"],["der Vater","","father"],["die Eltern","","parents"],["der Bruder","","brother"],["die Schwester","","sister"],["der Sohn","","son"],["die Tochter","","daughter"],["das Kind","","child"],["die Großeltern","","grandparents"],["der Ehemann","","husband"],["die Ehefrau","","wife"],["der Freund","","boyfriend"],["die Freundin","","girlfriend"],["verheiratet","","married"],["Ich habe zwei Brüder","","I have two brothers"],["Hast du Geschwister?","","do you have brothers or sisters?"],["Ich bin Einzelkind","","I'm an only child"],["Das ist meine Mutter","","this is my mum"],["Wie alt bist du?","","how old are you?"],["Ich bin dreißig Jahre alt","","I'm thirty years old"]]],
-["Numbers",[["null","","zero"],["eins","","one"],["zwei","","two"],["drei","","three"],["vier","","four"],["fünf","","five"],["sechs","","six"],["sieben","","seven"],["acht","","eight"],["neun","","nine"],["zehn","","ten"],["elf","","eleven"],["zwölf","","twelve"],["zwanzig","","twenty"],["einundzwanzig","","twenty-one"],["dreißig","","thirty"],["hundert","","a hundred"],["tausend","","a thousand"],["Wie viele?","","how many?"],["Wie viel kostet das?","","how much is it?"],["Das macht zehn Euro","","that comes to ten euros"]]],
-["Days and time",[["Montag","","Monday"],["Dienstag","","Tuesday"],["Mittwoch","","Wednesday"],["Donnerstag","","Thursday"],["Freitag","","Friday"],["Samstag","","Saturday"],["Sonntag","","Sunday"],["heute","","today"],["morgen","","tomorrow"],["gestern","","yesterday"],["die Woche","","week"],["das Wochenende","","weekend"],["der Monat","","month"],["das Jahr","","year"],["jetzt","","now"],["Wie spät ist es?","","what time is it?"],["Es ist drei Uhr","","it's three o'clock"],["Es ist halb vier","","it's half past three"],["am Montag","","on Monday"],["Bis nächste Woche","","see you next week"],["Wann hast du Geburtstag?","","when is your birthday?"],["Ich habe keine Zeit","","I don't have time"]]],
-["Food and drink",[["das Wasser","","water"],["der Kaffee","","coffee"],["die Milch","","milk"],["das Bier","","beer"],["der Wein","","wine"],["der Saft","","juice"],["das Brot","","bread"],["der Käse","","cheese"],["das Fleisch","","meat"],["das Hähnchen","","chicken"],["der Fisch","","fish"],["das Ei","","egg"],["das Gemüse","","vegetables"],["der Apfel","","apple"],["die Kartoffel","","potato"],["der Kuchen","","cake"],["das Frühstück","","breakfast"],["das Abendessen","","dinner"],["lecker","","tasty"],["Ich habe Hunger","","I'm hungry"],["Ich habe Durst","","I'm thirsty"],["Ich möchte einen Kaffee, bitte","","I'd like a coffee, please"],["Die Speisekarte, bitte","","the menu, please"],["Die Rechnung, bitte","","the bill, please"],["Zum Wohl!","","cheers!"],["Guten Appetit!","","enjoy your meal!"],["Ich bin Vegetarier","","I'm vegetarian"]]],
-["Hobbies",[["das Hobby","","hobby"],["spielen","","to play"],["lesen","","to read"],["schwimmen","","to swim"],["tanzen","","to dance"],["die Musik","","music"],["hören","","to listen"],["der Film","","film"],["fernsehen","","to watch TV"],["kochen","","to cook"],["reisen","","to travel"],["oft","","often"],["manchmal","","sometimes"],["nie","","never"],["gern","","gladly, with pleasure"],["Ich spiele gern Fußball","","I like playing football"],["Was machst du gern?","","what do you like doing?"],["Ich lese nicht gern","","I don't like reading"],["Ich gehe ins Kino","","I'm going to the cinema"],["Hast du am Wochenende Zeit?","","are you free at the weekend?"],["Das macht Spaß","","that's fun"],["Das ist langweilig","","that's boring"]]],
-["Everyday verbs",[["sein","","to be"],["haben","","to have"],["gehen","","to walk, to go"],["fahren","","to drive"],["kommen","","to come"],["machen","","to do, to make"],["essen","","to eat"],["trinken","","to drink"],["schlafen","","to sleep"],["arbeiten","","to work"],["wohnen","","to live (somewhere)"],["sprechen","","to speak"],["sehen","","to see"],["kaufen","","to buy"],["möchten","","would like"],["können","","to be able to"],["wollen","","to want"],["verstehen","","to understand"],["Ich wohne in London","","I live in London"],["Ich arbeite als Ingenieur","","I work as an engineer"],["Kannst du mir helfen?","","can you help me?"],["Ich muss gehen","","I have to go"],["Was machst du?","","what are you doing?"]]],
-["Getting around",[["der Bahnhof","","station"],["der Zug","","train"],["der Bus","","bus"],["der Flughafen","","airport"],["die Straße","","street"],["links","","left"],["rechts","","right"],["geradeaus","","straight on"],["hier","","here"],["dort","","there"],["die Fahrkarte","","ticket"],["teuer","","expensive"],["billig","","cheap"],["Wo ist die Toilette?","","where are the toilets?"],["Wo ist der Bahnhof?","","where is the station?"],["Ist es weit?","","is it far?"],["Es ist um die Ecke","","it's round the corner"],["Einmal nach Berlin, bitte","","a single to Berlin, please"],["Wann fährt der Zug?","","when does the train leave?"],["Ich habe mich verlaufen","","I'm lost"],["Nehmen Sie die zweite Straße links","","take the second street on the left"]]],
-["Romantic phrases",[["Du siehst wunderschön aus","","you look beautiful"],["Du siehst toll aus","","you look great"],["Du hast ein wunderschönes Lächeln","","you have a beautiful smile"],["Deine Augen sind wunderschön","","your eyes are beautiful"],["Ich mag dich","","I like you"],["Ich hab dich lieb","","I'm very fond of you"],["Ich liebe dich","","I love you"],["Ich bin in dich verliebt","","I'm in love with you"],["Ich denke an dich","","I'm thinking of you"],["Ich vermisse dich","","I miss you"],["Du bedeutest mir viel","","you mean a lot to me"],["Du bist etwas Besonderes","","you're someone special"],["Du machst mich glücklich","","you make me happy"],["Bei dir fühle ich mich wohl","","I feel comfortable with you"],["Ich bin gern bei dir","","I like being with you"],["Darf ich dich küssen?","","may I kiss you?"],["Küss mich","","kiss me"],["Kann ich deine Hand halten?","","can I hold your hand?"],["Möchtest du mit mir ausgehen?","","would you like to go out with me?"],["Hast du Lust auf ein Date?","","would you like to go on a date?"],["Möchtest du mit mir essen gehen?","","would you like to go out for dinner with me?"],["Darf ich dich zum Abendessen einladen?","","may I invite you to dinner?"],["Möchtest du mit mir tanzen?","","would you like to dance with me?"],["Wann sehe ich dich wieder?","","when will I see you again?"],["Ich kann es kaum erwarten, dich wiederzusehen","","I can't wait to see you again"],["Bleib noch ein bisschen","","stay a little longer"],["Schlaf gut, mein Schatz","","sleep well, my darling"],["Gute Nacht, Liebling","","good night, darling"]]],
-["Nuanced opinions",[["Meines Erachtens ist das entscheidend","","in my view, that is crucial"],["Ich bin da geteilter Meinung","","I have mixed feelings about that"],["Das lässt sich nicht pauschal beantworten","","that cannot be answered in general terms"],["Darauf kommt es nicht unbedingt an","","that is not necessarily what matters"],["Ich kann den Einwand nachvollziehen","","I can understand the objection"],["Das überzeugt mich nur bedingt","","I find that only partly convincing"],["Unter diesen Umständen wäre es vertretbar","","under these circumstances, it would be justifiable"],["Das steht außer Frage","","that is beyond question"],["Es spricht einiges dafür","","there is quite a lot to support it"],["Dagegen spricht, dass es teuer ist","","the argument against it is that it is expensive"],["Man darf nicht außer Acht lassen, dass …","","one must not overlook the fact that …"],["Das ist ein zweischneidiges Schwert","","that is a double-edged sword"],["Ich würde das differenzierter betrachten","","I would take a more nuanced view"],["Im Großen und Ganzen stimme ich zu","","by and large, I agree"],["Das hängt davon ab, wie man es betrachtet","","that depends on how you look at it"],["Damit bin ich nicht ganz einverstanden","","I do not entirely agree with that"],["Das leuchtet mir ein","","that makes sense to me"],["Ich habe da meine Zweifel","","I have my doubts about that"],["So einfach ist die Sache nicht","","the matter is not that simple"],["Letztlich läuft es darauf hinaus, dass …","","ultimately, it comes down to the fact that …"]]],
-["Konjunktiv II",[["Wenn ich mehr Zeit hätte, würde ich mitkommen","","if I had more time, I would come along"],["An deiner Stelle würde ich warten","","if I were you, I would wait"],["Ich wünschte, ich wäre schon dort","","I wish I were already there"],["Hätte ich das früher gewusst!","","if only I had known that earlier!"],["Das wäre mir lieber","","I would prefer that"],["Könnten Sie das bitte erläutern?","","could you please explain that?"],["Würden Sie mir einen Gefallen tun?","","would you do me a favour?"],["Ich hätte beinahe den Zug verpasst","","I almost missed the train"],["Es könnte sein, dass er recht hat","","it could be that he is right"],["Man müsste eine andere Lösung finden","","one would have to find another solution"],["Das dürfte kein Problem sein","","that should not be a problem"],["Ich würde nicht behaupten, dass …","","I would not claim that …"],["Er tut so, als ob nichts geschehen wäre","","he acts as though nothing had happened"],["Wenn dem so wäre, hätten wir ein Problem","","if that were so, we would have a problem"],["Es sei denn, du hast eine bessere Idee","","unless you have a better idea"],["Angenommen, wir hätten genug Geld …","","assuming we had enough money …"],["Je früher wir anfangen, desto besser","","the earlier we start, the better"],["Ohne deine Hilfe hätte ich es nicht geschafft","","without your help, I would not have managed it"],["Ich wäre lieber zu Hause geblieben","","I would rather have stayed at home"],["Das hätte nicht passieren dürfen","","that should not have happened"]]],
-["Idioms and expressions",[["Tomaten auf den Augen haben","","to fail to see what is obvious"],["um den heißen Brei herumreden","","to beat around the bush"],["den Nagel auf den Kopf treffen","","to hit the nail on the head"],["aus einer Mücke einen Elefanten machen","","to make a mountain out of a molehill"],["zwei Fliegen mit einer Klappe schlagen","","to kill two birds with one stone"],["jemandem die Daumen drücken","","to keep one's fingers crossed for someone"],["ins Fettnäpfchen treten","","to put one's foot in it"],["auf dem Schlauch stehen","","to be slow on the uptake"],["die Nase voll haben","","to be fed up"],["etwas auf die lange Bank schieben","","to keep putting something off"],["den Faden verlieren","","to lose one's train of thought"],["aus allen Wolken fallen","","to be completely astonished"],["sich zum Affen machen","","to make a fool of oneself"],["mit Ach und Krach","","only just; with great difficulty"],["etwas durch die Blume sagen","","to say something indirectly"],["unter vier Augen sprechen","","to speak in private"],["etwas auf eigene Faust tun","","to do something on one's own initiative"],["über den Tellerrand schauen","","to think outside the box"],["Das geht mir auf die Nerven","","that gets on my nerves"],["Da liegt der Hase im Pfeffer","","that is the heart of the problem"]]],
-["Formal and professional",[["bezüglich Ihrer Anfrage","","regarding your enquiry"],["anbei erhalten Sie die Unterlagen","","please find the documents attached"],["Wir möchten Sie darauf hinweisen, dass …","","we would like to point out that …"],["Bitte lassen Sie uns wissen, ob …","","please let us know whether …"],["Für Rückfragen stehe ich gern zur Verfügung","","I am happy to answer any further questions"],["Ich wäre Ihnen dankbar, wenn …","","I would be grateful if …"],["nach eingehender Prüfung","","after careful examination"],["unter Vorbehalt","","subject to change; provisionally"],["die Frist einhalten","","to meet the deadline"],["eine Vereinbarung treffen","","to reach an agreement"],["eine Entscheidung herbeiführen","","to bring about a decision"],["etwas in Betracht ziehen","","to take something into consideration"],["die Verantwortung übernehmen","","to assume responsibility"],["einen Antrag stellen","","to submit an application"],["den Erwartungen entsprechen","","to meet expectations"],["zur Verfügung stehen","","to be available"],["in Kraft treten","","to come into force"],["außer Kraft setzen","","to repeal; to invalidate"],["Rücksicht auf jemanden nehmen","","to show consideration for someone"],["im Einklang mit den Vorschriften","","in accordance with the regulations"]]],
-["False friends",[["aktuell","","current; up to date"],["eventuell","","possibly; perhaps"],["bekommen","","to receive"],["der Chef","","boss; manager"],["das Gift","","poison"],["der Rat","","advice"],["die Mappe","","folder; file"],["brav","","well-behaved"],["sensibel","","sensitive"],["prägnant","","concise; striking"],["also","","so; therefore"],["das Gymnasium","","academic secondary school"],["die Hochschule","","university; higher-education institution"],["der Roman","","novel"],["die Fabrik","","factory"],["die Kaution","","deposit; security"],["die Provision","","commission; fee"],["die Konkurrenz","","competition; competitors"],["die Billion","","trillion"],["die Milliarde","","billion"]]]
+  [
+    "Start here",
+    [
+      [
+        "ja",
+        "",
+        "yes"
+      ],
+      [
+        "nein",
+        "",
+        "no"
+      ],
+      [
+        "Hallo",
+        "",
+        "hello"
+      ],
+      [
+        "Tschüss",
+        "",
+        "bye"
+      ],
+      [
+        "bitte",
+        "",
+        "please"
+      ],
+      [
+        "danke",
+        "",
+        "thank you"
+      ],
+      [
+        "Entschuldigung",
+        "",
+        "excuse me"
+      ],
+      [
+        "gut",
+        "",
+        "good"
+      ],
+      [
+        "schlecht",
+        "",
+        "bad"
+      ],
+      [
+        "Okay",
+        "",
+        "okay"
+      ],
+      [
+        "Vielleicht",
+        "",
+        "maybe"
+      ],
+      [
+        "Bis bald",
+        "",
+        "see you soon"
+      ]
+    ]
+  ],
+  [
+    "Greetings",
+    [
+      [
+        "Guten Morgen",
+        "",
+        "good morning"
+      ],
+      [
+        "Guten Tag",
+        "",
+        "good afternoon (formal hello)"
+      ],
+      [
+        "Guten Abend",
+        "",
+        "good evening"
+      ],
+      [
+        "Gute Nacht",
+        "",
+        "good night"
+      ],
+      [
+        "Auf Wiedersehen",
+        "",
+        "goodbye (formal)"
+      ],
+      [
+        "Bis später",
+        "",
+        "see you later"
+      ],
+      [
+        "Bis morgen",
+        "",
+        "see you tomorrow"
+      ],
+      [
+        "Danke schön",
+        "",
+        "thank you very much"
+      ],
+      [
+        "Gern geschehen",
+        "",
+        "you're welcome"
+      ],
+      [
+        "Entschuldigung",
+        "",
+        "excuse me"
+      ],
+      [
+        "Es tut mir leid",
+        "",
+        "I'm sorry"
+      ],
+      [
+        "Wie geht es dir?",
+        "",
+        "how are you?"
+      ],
+      [
+        "Mir geht es gut",
+        "",
+        "I'm fine"
+      ]
+    ]
+  ],
+  [
+    "Family",
+    [
+      [
+        "die Familie",
+        "",
+        "family"
+      ],
+      [
+        "die Mutter",
+        "",
+        "mother"
+      ],
+      [
+        "der Vater",
+        "",
+        "father"
+      ],
+      [
+        "die Eltern",
+        "",
+        "parents"
+      ],
+      [
+        "der Bruder",
+        "",
+        "brother"
+      ],
+      [
+        "die Schwester",
+        "",
+        "sister"
+      ],
+      [
+        "der Sohn",
+        "",
+        "son"
+      ],
+      [
+        "die Tochter",
+        "",
+        "daughter"
+      ],
+      [
+        "das Kind",
+        "",
+        "child"
+      ],
+      [
+        "die Großeltern",
+        "",
+        "grandparents"
+      ],
+      [
+        "der Ehemann",
+        "",
+        "husband"
+      ],
+      [
+        "die Ehefrau",
+        "",
+        "wife"
+      ]
+    ]
+  ],
+  [
+    "Numbers",
+    [
+      [
+        "null",
+        "",
+        "zero"
+      ],
+      [
+        "eins",
+        "",
+        "one"
+      ],
+      [
+        "zwei",
+        "",
+        "two"
+      ],
+      [
+        "drei",
+        "",
+        "three"
+      ],
+      [
+        "vier",
+        "",
+        "four"
+      ],
+      [
+        "fünf",
+        "",
+        "five"
+      ],
+      [
+        "sechs",
+        "",
+        "six"
+      ],
+      [
+        "sieben",
+        "",
+        "seven"
+      ],
+      [
+        "acht",
+        "",
+        "eight"
+      ],
+      [
+        "neun",
+        "",
+        "nine"
+      ],
+      [
+        "zehn",
+        "",
+        "ten"
+      ],
+      [
+        "elf",
+        "",
+        "eleven"
+      ],
+      [
+        "zwölf",
+        "",
+        "twelve"
+      ],
+      [
+        "zwanzig",
+        "",
+        "twenty"
+      ],
+      [
+        "einundzwanzig",
+        "",
+        "twenty-one"
+      ],
+      [
+        "dreißig",
+        "",
+        "thirty"
+      ]
+    ]
+  ],
+  [
+    "Days and time",
+    [
+      [
+        "Montag",
+        "",
+        "Monday"
+      ],
+      [
+        "Dienstag",
+        "",
+        "Tuesday"
+      ],
+      [
+        "Mittwoch",
+        "",
+        "Wednesday"
+      ],
+      [
+        "Donnerstag",
+        "",
+        "Thursday"
+      ],
+      [
+        "Freitag",
+        "",
+        "Friday"
+      ],
+      [
+        "Samstag",
+        "",
+        "Saturday"
+      ],
+      [
+        "Sonntag",
+        "",
+        "Sunday"
+      ],
+      [
+        "heute",
+        "",
+        "today"
+      ],
+      [
+        "morgen",
+        "",
+        "tomorrow"
+      ],
+      [
+        "gestern",
+        "",
+        "yesterday"
+      ],
+      [
+        "jetzt",
+        "",
+        "now"
+      ],
+      [
+        "später",
+        "",
+        "later"
+      ]
+    ]
+  ],
+  [
+    "Food and drink",
+    [
+      [
+        "das Wasser",
+        "",
+        "water"
+      ],
+      [
+        "der Kaffee",
+        "",
+        "coffee"
+      ],
+      [
+        "die Milch",
+        "",
+        "milk"
+      ],
+      [
+        "das Bier",
+        "",
+        "beer"
+      ],
+      [
+        "der Wein",
+        "",
+        "wine"
+      ],
+      [
+        "der Saft",
+        "",
+        "juice"
+      ],
+      [
+        "das Brot",
+        "",
+        "bread"
+      ],
+      [
+        "der Käse",
+        "",
+        "cheese"
+      ],
+      [
+        "das Fleisch",
+        "",
+        "meat"
+      ],
+      [
+        "das Hähnchen",
+        "",
+        "chicken"
+      ],
+      [
+        "der Fisch",
+        "",
+        "fish"
+      ],
+      [
+        "das Ei",
+        "",
+        "egg"
+      ],
+      [
+        "das Gemüse",
+        "",
+        "vegetables"
+      ],
+      [
+        "der Apfel",
+        "",
+        "apple"
+      ],
+      [
+        "die Kartoffel",
+        "",
+        "potato"
+      ],
+      [
+        "der Kuchen",
+        "",
+        "cake"
+      ]
+    ]
+  ],
+  [
+    "Hobbies",
+    [
+      [
+        "das Hobby",
+        "",
+        "hobby"
+      ],
+      [
+        "spielen",
+        "",
+        "to play"
+      ],
+      [
+        "lesen",
+        "",
+        "to read"
+      ],
+      [
+        "schwimmen",
+        "",
+        "to swim"
+      ],
+      [
+        "tanzen",
+        "",
+        "to dance"
+      ],
+      [
+        "die Musik",
+        "",
+        "music"
+      ],
+      [
+        "hören",
+        "",
+        "to listen"
+      ],
+      [
+        "der Film",
+        "",
+        "film"
+      ],
+      [
+        "fernsehen",
+        "",
+        "to watch TV"
+      ],
+      [
+        "kochen",
+        "",
+        "to cook"
+      ],
+      [
+        "reisen",
+        "",
+        "to travel"
+      ],
+      [
+        "oft",
+        "",
+        "often"
+      ],
+      [
+        "manchmal",
+        "",
+        "sometimes"
+      ],
+      [
+        "nie",
+        "",
+        "never"
+      ]
+    ]
+  ],
+  [
+    "Everyday verbs",
+    [
+      [
+        "sein",
+        "",
+        "to be"
+      ],
+      [
+        "haben",
+        "",
+        "to have"
+      ],
+      [
+        "gehen",
+        "",
+        "to walk, to go"
+      ],
+      [
+        "fahren",
+        "",
+        "to go by vehicle"
+      ],
+      [
+        "kommen",
+        "",
+        "to come"
+      ],
+      [
+        "machen",
+        "",
+        "to do, to make"
+      ],
+      [
+        "essen",
+        "",
+        "to eat"
+      ],
+      [
+        "trinken",
+        "",
+        "to drink"
+      ],
+      [
+        "schlafen",
+        "",
+        "to sleep"
+      ],
+      [
+        "arbeiten",
+        "",
+        "to work"
+      ],
+      [
+        "wohnen",
+        "",
+        "to live (somewhere)"
+      ],
+      [
+        "sprechen",
+        "",
+        "to speak"
+      ],
+      [
+        "sehen",
+        "",
+        "to see"
+      ],
+      [
+        "kaufen",
+        "",
+        "to buy"
+      ]
+    ]
+  ],
+  [
+    "Getting around",
+    [
+      [
+        "der Bahnhof",
+        "",
+        "station"
+      ],
+      [
+        "der Zug",
+        "",
+        "train"
+      ],
+      [
+        "der Bus",
+        "",
+        "bus"
+      ],
+      [
+        "der Flughafen",
+        "",
+        "airport"
+      ],
+      [
+        "die Straße",
+        "",
+        "street"
+      ],
+      [
+        "links",
+        "",
+        "left"
+      ],
+      [
+        "rechts",
+        "",
+        "right"
+      ],
+      [
+        "geradeaus",
+        "",
+        "straight on"
+      ],
+      [
+        "hier",
+        "",
+        "here"
+      ],
+      [
+        "dort",
+        "",
+        "there"
+      ],
+      [
+        "die Fahrkarte",
+        "",
+        "ticket"
+      ],
+      [
+        "teuer",
+        "",
+        "expensive"
+      ],
+      [
+        "billig",
+        "",
+        "cheap"
+      ],
+      [
+        "Wo ist die Toilette?",
+        "",
+        "where are the toilets?"
+      ],
+      [
+        "Wo ist der Bahnhof?",
+        "",
+        "where is the station?"
+      ],
+      [
+        "Ist es weit?",
+        "",
+        "is it far?"
+      ]
+    ]
+  ],
+  [
+    "Everyday phrases",
+    [
+      [
+        "Wie geht es dir?",
+        "",
+        "how are you?"
+      ],
+      [
+        "Mir geht es gut",
+        "",
+        "I am fine"
+      ],
+      [
+        "Ich heiße Hugo",
+        "",
+        "my name is Hugo"
+      ],
+      [
+        "Wie heißt du?",
+        "",
+        "what is your name?"
+      ],
+      [
+        "Ich komme aus England",
+        "",
+        "I come from England"
+      ],
+      [
+        "Ich wohne in London",
+        "",
+        "I live in London"
+      ],
+      [
+        "Ich weiß nicht",
+        "",
+        "I do not know"
+      ],
+      [
+        "Ich verstehe nicht",
+        "",
+        "I do not understand"
+      ],
+      [
+        "Kein Problem",
+        "",
+        "no problem"
+      ],
+      [
+        "Ich habe Hunger",
+        "",
+        "I am hungry"
+      ],
+      [
+        "Ich habe Durst",
+        "",
+        "I am thirsty"
+      ],
+      [
+        "Ich muss gehen",
+        "",
+        "I have to go"
+      ]
+    ]
+  ],
+  [
+    "At home",
+    [
+      [
+        "das Haus",
+        "",
+        "house"
+      ],
+      [
+        "die Wohnung",
+        "",
+        "flat"
+      ],
+      [
+        "das Zimmer",
+        "",
+        "room"
+      ],
+      [
+        "die Küche",
+        "",
+        "kitchen"
+      ],
+      [
+        "das Bad",
+        "",
+        "bathroom"
+      ],
+      [
+        "das Bett",
+        "",
+        "bed"
+      ],
+      [
+        "der Tisch",
+        "",
+        "table"
+      ],
+      [
+        "der Stuhl",
+        "",
+        "chair"
+      ],
+      [
+        "die Tür",
+        "",
+        "door"
+      ],
+      [
+        "das Fenster",
+        "",
+        "window"
+      ],
+      [
+        "der Schlüssel",
+        "",
+        "key"
+      ],
+      [
+        "Ich bin zu Hause",
+        "",
+        "I am at home"
+      ]
+    ]
+  ],
+  [
+    "Shopping and ordering",
+    [
+      [
+        "das Geld",
+        "",
+        "money"
+      ],
+      [
+        "der Euro",
+        "",
+        "euro"
+      ],
+      [
+        "der Laden",
+        "",
+        "shop"
+      ],
+      [
+        "die Tasche",
+        "",
+        "bag"
+      ],
+      [
+        "offen",
+        "",
+        "open"
+      ],
+      [
+        "geschlossen",
+        "",
+        "closed"
+      ],
+      [
+        "Ein Wasser, bitte",
+        "",
+        "a water, please"
+      ],
+      [
+        "Einen Kaffee, bitte",
+        "",
+        "a coffee, please"
+      ],
+      [
+        "Was kostet das?",
+        "",
+        "how much does that cost?"
+      ],
+      [
+        "Das ist teuer",
+        "",
+        "that is expensive"
+      ],
+      [
+        "Mit Karte, bitte",
+        "",
+        "by card, please"
+      ],
+      [
+        "Die Rechnung, bitte",
+        "",
+        "the bill, please"
+      ]
+    ]
+  ],
+  [
+    "Feelings and descriptions",
+    [
+      [
+        "müde",
+        "",
+        "tired"
+      ],
+      [
+        "glücklich",
+        "",
+        "happy"
+      ],
+      [
+        "traurig",
+        "",
+        "sad"
+      ],
+      [
+        "krank",
+        "",
+        "ill"
+      ],
+      [
+        "hungrig",
+        "",
+        "hungry"
+      ],
+      [
+        "durstig",
+        "",
+        "thirsty"
+      ],
+      [
+        "warm",
+        "",
+        "warm"
+      ],
+      [
+        "kalt",
+        "",
+        "cold"
+      ],
+      [
+        "groß",
+        "",
+        "big"
+      ],
+      [
+        "klein",
+        "",
+        "small"
+      ],
+      [
+        "Ich bin müde",
+        "",
+        "I am tired"
+      ],
+      [
+        "Mir ist kalt",
+        "",
+        "I feel cold"
+      ]
+    ]
+  ],
+  [
+    "Asking for help",
+    [
+      [
+        "Hilfe!",
+        "",
+        "help!"
+      ],
+      [
+        "Wo?",
+        "",
+        "where?"
+      ],
+      [
+        "Wann?",
+        "",
+        "when?"
+      ],
+      [
+        "Was?",
+        "",
+        "what?"
+      ],
+      [
+        "Wer?",
+        "",
+        "who?"
+      ],
+      [
+        "Warum?",
+        "",
+        "why?"
+      ],
+      [
+        "Langsam, bitte",
+        "",
+        "slowly, please"
+      ],
+      [
+        "Noch einmal, bitte",
+        "",
+        "again, please"
+      ],
+      [
+        "Bitte helfen Sie mir",
+        "",
+        "please help me"
+      ],
+      [
+        "Sprechen Sie Englisch?",
+        "",
+        "do you speak English?"
+      ],
+      [
+        "Wo ist die Toilette?",
+        "",
+        "where is the toilet?"
+      ],
+      [
+        "Ich suche den Bahnhof",
+        "",
+        "I am looking for the station"
+      ]
+    ]
+  ],
+  [
+    "Romantic basics",
+    [
+      [
+        "Ich mag dich",
+        "",
+        "I like you"
+      ],
+      [
+        "Ich liebe dich",
+        "",
+        "I love you"
+      ],
+      [
+        "Ich vermisse dich",
+        "",
+        "I miss you"
+      ],
+      [
+        "Du bist süß",
+        "",
+        "you are cute"
+      ],
+      [
+        "Du bist schön",
+        "",
+        "you are beautiful"
+      ],
+      [
+        "Küss mich",
+        "",
+        "kiss me"
+      ],
+      [
+        "Darf ich dich küssen?",
+        "",
+        "may I kiss you?"
+      ],
+      [
+        "mein Schatz",
+        "",
+        "my darling"
+      ],
+      [
+        "Ich denke an dich",
+        "",
+        "I am thinking of you"
+      ],
+      [
+        "Schlaf gut",
+        "",
+        "sleep well"
+      ]
+    ]
+  ]
 ];
-
-const HARD_DE_LESSONS=new Set(["Nuanced opinions","Konjunktiv II","Idioms and expressions","Formal and professional","False friends"]);
 
 const LANG={
   zh:{data:ZH,title:"Mandarin flashcards",doc:"Mandarin Flashcards",first:"Chinese first",search:"Search Chinese, pinyin or English",cls:"zh",tag:"zh-CN",key:n=>n,nameKey:"mandarin-name"},
-  de:{data:DE,title:"German flashcards",doc:"German Flashcards",first:"German first",search:"Search German or English",cls:"de",tag:"de",key:n=>"de:"+n,nameKey:"mandarin-name"}
+  de:{data:DE,title:"German flashcards",doc:"German Flashcards",first:"German first",search:"Search German or English",cls:"de",tag:"de",key:n=>"de:beginner-v1:"+n,nameKey:"mandarin-name"}
 };
 let lang="de";
 let D=LANG[lang].data;
@@ -457,10 +1491,7 @@ function nextQuestion(){
   if(G.i>=G.questions.length)return finishGame();
   const {w,dir}=G.questions[G.i];
   const candidates=G.pool.filter(o=>o[0]!==w[0]&&o[2]!==w[2]);
-  const targetText=dir==="zh"?w[2]:w[0];
-  const closeness=o=>Math.abs((dir==="zh"?o[2]:o[0]).length-targetText.length);
-  const hardGerman=lang==="de"&&HARD_DE_LESSONS.has(current);
-  const others=(hardGerman?shuffle(candidates).sort((a,b)=>closeness(a)-closeness(b)):shuffle(candidates)).slice(0,3);
+  const others=shuffle(candidates).slice(0,3);
   const opts=shuffle([w,...others]);
   $("qNum").textContent=`${G.i+1} of ${G.questions.length}`;
   $("gScore").textContent=fmt(G.score);
@@ -471,7 +1502,7 @@ function nextQuestion(){
   G.answer=w[0]+"|"+w[2];
   G.locked=false;
   G.start=performance.now();
-  G.limit=lang==="de"?(HARD_DE_LESSONS.has(current)?12000:15000):TIME_LIMIT;
+  G.limit=lang==="de"?15000:TIME_LIMIT;
   const tick=now=>{
     const left=Math.max(0,1-(now-G.start)/G.limit);
     $("timerFill").style.transform=`scaleX(${left})`;
