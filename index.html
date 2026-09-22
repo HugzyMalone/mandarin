@@ -194,6 +194,11 @@ h2{margin-bottom:0;font-size:1.4rem;line-height:1.1}
     <h1 id="homeTitle">Mandarin flashcards</h1>
     <p class="sub">Pick a lesson, play for points, put your name on the board.</p>
   </div>
+  <section aria-label="All Mandarin vocabulary" style="display:grid;gap:12px">
+    <button type="button" class="btn primary" id="practiceAll">Practise all</button>
+    <button type="button" class="btn" id="testAll">Test all · 20 random words</button>
+    <p class="sub" style="margin:0">Practise every word at your own pace, or take a fresh 20-word test.</p>
+  </section>
   <section>
     <p class="label">Lessons won</p>
     <div class="standings" id="standings"></div>
@@ -335,10 +340,12 @@ let D=LANG[lang].data;
 const L=()=>LANG[lang];
 const fw=(w,cls="")=>`<span class="${cls} ${L().cls}" lang="${L().tag}">${esc(w[0])}</span>`;
 const pyOf=w=>w[1]?`<span class="py">${esc(w[1])}</span>`:"";
-const words=name=>{if(name===HARD)return challenge.pool;const seen=new Set();return D.find(d=>d[0]===name)[1].filter(w=>{const k=w[0]+"|"+w[2];if(seen.has(k))return false;seen.add(k);return true})};
+const allWords=()=>[...new Map(ZH.flatMap(d=>d[1]).map(w=>[w[0]+"|"+w[2],w])).values()];
+const words=name=>{if(name===ALL)return allWords();if(name===HARD)return challenge.pool;const seen=new Set();return D.find(d=>d[0]===name)[1].filter(w=>{const k=w[0]+"|"+w[2];if(seen.has(k))return false;seen.add(k);return true})};
 
 let scores=[],scoresError=false,current=null,lastSavedId=null;
 const HARD="Hardest words";
+const ALL="All vocabulary";
 const PLAYERS=new Set(["HUGZY","AZZA"]);
 const wordKey=w=>w[0]+"|"+w[2];
 // Stable IDs remain valid when vocabulary is reordered or lessons are added.
@@ -375,7 +382,7 @@ function buildChallenge(){
   $("hardestSummary").textContent=scoresError?"Could not load your results. Reopen when connected.":!challenge?"Save a lesson score as HUGZY or AZZA to build your first challenge. New results join tomorrow’s set.":`${pool.length} words · same daily set for both players · 100 points per correct answer · no timer. `+(tracked?"Chosen from your recorded word mistakes.":"Starting with your hardest lessons; individual word tracking starts now.")+" Updates at midnight UTC.";
 }
 function challengeLesson(){return current===HARD}
-function leaderboardKey(lesson){return lesson===HARD?challenge.key:L().key(lesson)}
+function leaderboardKey(lesson){if(lesson===ALL)return "zh:all-20:v1";return lesson===HARD?challenge.key:L().key(lesson)}
 
 
 function show(id){
@@ -431,7 +438,7 @@ function renderBoard(lesson){
 function openLesson(name){
   current=name;
   $("lessonTitle").textContent=name;
-  $("lessonMeta").textContent=name===HARD?`${challenge.day} · ${words(name).length} words · 100 points each · no timer. Best score per player; equal scores share the lead.`:`${words(name).length} words`;
+  $("lessonMeta").textContent=name===ALL?`${allWords().length} words to practise · 20 random words per test`:name===HARD?`${challenge.day} · ${words(name).length} words · 100 points each · no timer. Best score per player; equal scores share the lead.`:`${words(name).length} words`;
   renderBoard(name);
   show("lesson");
 }
@@ -461,7 +468,7 @@ function fixedOrder(items,seed){return [...items].sort((a,b)=>fingerprint(seed+w
 function startGame(){
   const pool=words(current);
   const hard=challengeLesson();
-  G={lesson:current,key:leaderboardKey(current),hard,pool,records:[],questions:(hard?[...pool]:shuffle([...pool])).map((w,i)=>({w,dir:hard?(i%2?"en":"zh"):(Math.random()<.5?"zh":"en")})),i:0,score:0,correct:0,locked:false,start:0};
+  G={lesson:current,key:leaderboardKey(current),hard,pool,records:[],questions:(hard?[...pool]:shuffle([...pool])).slice(0,current===ALL?20:pool.length).map((w,i)=>({w,dir:hard?(i%2?"en":"zh"):(Math.random()<.5?"zh":"en")})),i:0,score:0,correct:0,locked:false,start:0};
   document.querySelector(".timer").hidden=hard;
   $("nextHardest").hidden=true;
   show("game");
@@ -598,6 +605,8 @@ function pGrade(ok){
   P.flipped=false;
   drawPractice();
 }
+$("practiceAll").addEventListener("click",()=>{current=ALL;startPractice()});
+$("testAll").addEventListener("click",()=>{current=ALL;startGame()});
 $("practise").addEventListener("click",startPractice);
 $("endPractice").addEventListener("click",()=>openLesson(current));
 $("pCard").addEventListener("click",()=>{if(P.deck.length){P.flipped=!P.flipped;drawPractice()}});
