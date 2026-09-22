@@ -240,6 +240,12 @@ h1{font-size:2.6rem;line-height:.98;text-wrap:balance}
     <h1 id="homeTitle">German flashcards</h1>
     <p class="sub">Start with everyday basics. Short lessons, simple phrases, and untimed practice whenever you need it.</p>
   </div>
+  <section id="hugzyReview">
+    <div class="sechead"><h2>Hugzy’s next practice</h2></div>
+    <p class="sub" id="reviewSummary">Loading your recent results…</p>
+    <button type="button" class="primary" id="reviewWeak" disabled style="margin-top:16px">Practise my weaker words</button>
+    <p class="sub" id="reviewStrengths"></p>
+  </section>
   <section>
     <div class="sechead"><h2>Lessons won</h2><span>Top score holders</span></div>
     <div class="standings" id="standings"></div>
@@ -323,6 +329,7 @@ h1{font-size:2.6rem;line-height:.98;text-wrap:balance}
   <div class="words" id="wordList"></div>
 </main>
 
+<script src="../tracking.js?v=2" data-player="HUGZY"></script>
 <script>
 const SUPABASE_URL="https://cfljidsexwvhalvvlbxi.supabase.co";
 const SUPABASE_KEY="sb_publishable_kxC0kvIBXsHCeXVf6yosbg_b-nAEO6N";
@@ -1413,11 +1420,14 @@ let D=LANG[lang].data;
 const L=()=>LANG[lang];
 const fw=(w,cls="")=>`<span class="${cls} ${L().cls}" lang="${L().tag}">${esc(w[0])}</span>`;
 const pyOf=w=>w[1]?`<span class="py">${esc(w[1])}</span>`:"";
-const words=name=>{const seen=new Set();return D.find(d=>d[0]===name)[1].filter(w=>{const k=w[0]+"|"+w[2];if(seen.has(k))return false;seen.add(k);return true})};
+const REVIEW="Hugzy review";
+let reviewPool=[],reviewLesson="Start here",wordEvents=[],eventsError=false;
+const words=name=>{if(name===REVIEW)return reviewPool;const seen=new Set();return D.find(d=>d[0]===name)[1].filter(w=>{const k=w[0]+"|"+w[2];if(seen.has(k))return false;seen.add(k);return true})};
 
 let scores=[],scoresError=false,current=null,lastSavedId=null;
 
 function show(id){
+  Learning.active(id==="game"||id==="practice");
   document.querySelectorAll("main.view").forEach(v=>v.hidden=v.id!==id);
   window.scrollTo(0,0);
 }
@@ -1429,13 +1439,46 @@ async function api(path,opts={}){
 }
 
 async function loadScores(){
-  try{scores=await api("scores?select=id,lesson,name,score,correct,total,created_at&order=score.desc,created_at.asc&limit=5000");scoresError=false}
-  catch{scoresError=true}
+  try{
+    const rows=[];
+    for(let offset=0;;offset+=1000){
+      const page=await api(`scores?lesson=like.de:*&select=id,lesson,name,score,correct,total,created_at&order=id.asc&limit=1000&offset=${offset}`);
+      rows.push(...page);if(page.length<1000)break;
+    }
+    scores=rows.sort((a,b)=>b.score-a.score||a.created_at.localeCompare(b.created_at));scoresError=false;
+  }catch{scoresError=true}
+  try{wordEvents=await api("scores?lesson=like.ev2:de:*&name=eq.HUGZY&select=lesson,correct,created_at&order=created_at.desc&limit=1000");eventsError=false}catch{eventsError=true}
+}
+function latestResult(name){return scores.filter(s=>s.name.trim().toUpperCase()==="HUGZY"&&s.lesson===L().key(name)).sort((a,b)=>b.created_at.localeCompare(a.created_at))[0]}
+function updateReview(){
+  const tested=DE.map(([name])=>({name,row:latestResult(name)})).filter(x=>x.row);
+  const weak=tested.filter(x=>x.row.correct<x.row.total).sort((a,b)=>a.row.correct/a.row.total-b.row.correct/b.row.total||a.name.localeCompare(b.name));
+  reviewLesson=weak[0]?.name||"Start here";
+  const all=[...new Map(DE.flatMap(d=>d[1]).map(w=>[w[0]+"|"+w[2],w])).values()];
+  const stats=new Map(),seen=new Set();
+  for(const r of eventsError?[]:wordEvents){
+    if(seen.has(r.lesson))continue;seen.add(r.lesson);
+    const key=r.lesson.split(":")[3],v=stats.get(key)||[];
+    if(v.length<5)v.push(r.correct);stats.set(key,v);
+  }
+  const missed=all.filter(w=>{const v=stats.get(Learning.hash(w[0]+"|"+w[2]));return v?.includes(0)&&!(v.length>=3&&v.slice(0,3).every(Boolean))}).sort((a,b)=>{
+    const x=stats.get(Learning.hash(a[0]+"|"+a[2])),y=stats.get(Learning.hash(b[0]+"|"+b[2]));return y.filter(v=>!v).length/y.length-x.filter(v=>!v).length/x.length;
+  });
+  // Rotate through weak lessons, rather than drawing only the first lesson's words.
+  const decks=weak.slice(0,3).map(x=>shuffle([...words(x.name)]));
+  const fallback=[];for(let i=0;i<16;i++)for(const deck of decks)if(deck[i])fallback.push(deck[i]);
+  reviewPool=missed.length?missed.slice(0,10):fallback.slice(0,10);
+  if(!reviewPool.length)reviewPool=shuffle(all).slice(0,10);
+  $("reviewWeak").disabled=scoresError;
+  $("reviewSummary").textContent=scoresError?"Your results could not load. Reconnect to build your review.":missed.length?`${reviewPool.length} words selected from your recent mistakes and “Again” ratings. Three correct reviews in a row move a word out of this group.`:weak.length?"Start with "+weak.slice(0,3).map(x=>`${x.name} (${x.row.correct}/${x.row.total})`).join(", ")+". This review uses lesson totals until specific missed words are recorded.":"A short mixed review of your beginner vocabulary. Your next answers will help personalise it.";
+  const strong=tested.filter(x=>x.row.correct===x.row.total);
+  $("reviewStrengths").textContent=strong.length?`${strong.length} lessons scored 100% on your latest test — we’ll give the weaker areas more practice.`:"";
 }
 
 const boardFor=lesson=>scores.filter(s=>s.lesson===L().key(lesson));
 
 function renderHome(){
+  updateReview();
   const wins={};
   for(const [name] of D){const top=boardFor(name)[0];if(top)wins[top.name]=(wins[top.name]||0)+1}
   const ranked=Object.entries(wins).sort((a,b)=>b[1]-a[1]);
@@ -1456,6 +1499,7 @@ function renderBoard(lesson){
 }
 
 function openLesson(name){
+  if(name===REVIEW)name=reviewLesson;
   current=name;
   $("lessonTitle").textContent=name;
   $("lessonMeta").textContent=`${words(name).length} words`;
@@ -1480,8 +1524,10 @@ document.querySelectorAll("[data-home]").forEach(b=>b.addEventListener("click",(
 let G=null,raf=0;
 
 function startGame(){
+  if(current===REVIEW)current=reviewLesson;
+  if(!Learning.player())return Learning.choose(startGame);
   const pool=words(current);
-  G={lesson:current,pool,questions:shuffle([...pool]).map(w=>({w,dir:Math.random()<.5?"zh":"en"})),i:0,score:0,correct:0,locked:false,start:0};
+  G={player:Learning.player(),lesson:current,pool,questions:shuffle([...pool]).map(w=>({w,dir:Math.random()<.5?"zh":"en"})),i:0,score:0,correct:0,locked:false,start:0};
   show("game");
   nextQuestion();
 }
@@ -1518,6 +1564,7 @@ function answer(key){
   cancelAnimationFrame(raf);
   const left=Math.max(0,1-(performance.now()-G.start)/G.limit);
   const ok=key===G.answer;
+  Learning.record({name:G.player,language:lang,mode:"q",direction:G.questions[G.i].dir,word:G.questions[G.i].w,answer:key,correct:ok,elapsed:performance.now()-G.start});
   const pts=ok?100+Math.round(100*left):0;
   G.score+=pts;
   if(ok)G.correct++;
@@ -1529,7 +1576,7 @@ function answer(key){
   });
   $("qCard").insertAdjacentHTML("beforeend",`<span class="pop ${ok?"":"miss"}">${ok?`+${pts}`:key===null?"Time up":"Miss"}</span>`);
   G.i++;
-  setTimeout(()=>{if(G&&!$("game").hidden)nextQuestion()},ok?750:1600);
+  const round=G;setTimeout(()=>{if(G===round&&!$("game").hidden)nextQuestion()},ok?750:1600);
 }
 
 $("options").addEventListener("click",e=>{const b=e.target.closest("button");if(b&&G)answer(b.dataset.key)});
@@ -1542,7 +1589,8 @@ function finishGame(){
   $("rScore").textContent=fmt(G.score);
   $("rDetail").textContent=`${G.correct} of ${G.questions.length} right`;
   $("rRank").textContent=rank===1?(board.length?"New top score":"First score on this lesson"):rank<=10?`That would be number ${rank} on the board`:"";
-  $("nameInput").value=store.get("mandarin-name")||"";
+  $("nameInput").value=G.player;
+  $("nameInput").readOnly=true;
   $("saveMsg").hidden=true;
   $("saveBtn").disabled=false;
   $("saveBtn").textContent="Save to leaderboard";
@@ -1551,7 +1599,7 @@ function finishGame(){
 
 $("nameForm").addEventListener("submit",async e=>{
   e.preventDefault();
-  const name=$("nameInput").value.trim().toUpperCase().slice(0,12);
+  const name=G?.player;
   if(!name||!G)return;
   if(PREVIEW){$("saveMsg").textContent="Design preview: scores are not saved here.";$("saveMsg").hidden=false;return}
   $("saveBtn").disabled=true;
@@ -1576,7 +1624,8 @@ $("play").addEventListener("click",startGame);
 
 let P=null,pDir="zh";
 function startPractice(){
-  P={deck:shuffle(words(current).map(w=>[...w])),total:0,known:0,flipped:false};
+  if(!Learning.player())return Learning.choose(startPractice);
+  P={player:Learning.player(),started:performance.now(),deck:shuffle(words(current).map(w=>[...w])),total:0,known:0,flipped:false};
   P.total=P.deck.length;
   $("pTitle").textContent=current;
   show("practice");
@@ -1602,10 +1651,13 @@ function drawPractice(){
 function pGrade(ok){
   if(!P.deck.length||!P.flipped)return;
   const c=P.deck.shift();
+  Learning.record({name:P.player,language:lang,mode:"p",direction:pDir,word:c,answer:null,correct:ok,elapsed:performance.now()-P.started});
+  P.started=performance.now();
   if(ok)P.known++;else P.deck.splice(Math.min(P.deck.length,3+Math.floor(Math.random()*4)),0,c);
   P.flipped=false;
   drawPractice();
 }
+$("reviewWeak").addEventListener("click",async()=>{await Learning.flush();await loadScores();updateReview();if(!scoresError){current=REVIEW;startPractice()}});
 $("practise").addEventListener("click",startPractice);
 $("endPractice").addEventListener("click",()=>openLesson(current));
 $("pCard").addEventListener("click",()=>{if(P.deck.length){P.flipped=!P.flipped;drawPractice()}});
@@ -1613,6 +1665,7 @@ $("pAgain").addEventListener("click",()=>pGrade(false));
 $("pGot").addEventListener("click",()=>pGrade(true));
 document.querySelectorAll("[data-dir]").forEach(b=>b.addEventListener("click",()=>{
   pDir=b.dataset.dir;
+  P.started=performance.now();
   document.querySelectorAll("[data-dir]").forEach(x=>x.setAttribute("aria-pressed",x===b));
   P.flipped=false;
   drawPractice();

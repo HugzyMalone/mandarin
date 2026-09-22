@@ -292,6 +292,7 @@ h2{margin-bottom:0;font-size:1.4rem;line-height:1.1}
   <div class="words" id="wordList"></div>
 </main>
 
+<script src="tracking.js?v=2"></script>
 <script>
 const SUPABASE_URL="https://cfljidsexwvhalvvlbxi.supabase.co";
 const SUPABASE_KEY="sb_publishable_kxC0kvIBXsHCeXVf6yosbg_b-nAEO6N";
@@ -364,6 +365,12 @@ function buildChallenge(){
   for(const s of history.filter(s=>s.lesson.startsWith("word:v1:"))){
     const v=stats.get(s.lesson)||{miss:0,total:0};v.miss+=s.total-s.correct;v.total+=s.total;stats.set(s.lesson,v);
   }
+  const eventIds=new Set();
+  for(const row of history.filter(r=>r.lesson.startsWith("ev2:zh:"))){
+    if(eventIds.has(row.lesson))continue;eventIds.add(row.lesson);
+    const parts=row.lesson.split(":"),key="word:v1:"+parts[3];
+    const v=stats.get(key)||{miss:0,total:0};v.miss+=row.correct?0:1;v.total++;stats.set(key,v);
+  }
   const all=[...new Map(ZH.flatMap(d=>d[1]).map(w=>[wordKey(w),w])).values()];
   let pool=all.filter(w=>stats.get(wordRecord(w))?.miss>0).sort((a,b)=>{
     const x=stats.get(wordRecord(a)),y=stats.get(wordRecord(b));
@@ -386,6 +393,7 @@ function leaderboardKey(lesson){if(lesson===ALL)return "zh:all-20:v1";return les
 
 
 function show(id){
+  Learning.active(id==="game"||id==="practice");
   document.querySelectorAll("main.view").forEach(v=>v.hidden=v.id!==id);
   window.scrollTo(0,0);
 }
@@ -466,9 +474,10 @@ function fixedOrder(items,seed){return [...items].sort((a,b)=>fingerprint(seed+w
 
 
 function startGame(){
+  if(!Learning.player())return Learning.choose(startGame);
   const pool=words(current);
   const hard=challengeLesson();
-  G={lesson:current,key:leaderboardKey(current),hard,pool,records:[],questions:(hard?[...pool]:shuffle([...pool])).slice(0,current===ALL?20:pool.length).map((w,i)=>({w,dir:hard?(i%2?"en":"zh"):(Math.random()<.5?"zh":"en")})),i:0,score:0,correct:0,locked:false,start:0};
+  G={player:Learning.player(),lesson:current,key:leaderboardKey(current),hard,pool,records:[],questions:(hard?[...pool]:shuffle([...pool])).slice(0,current===ALL?20:pool.length).map((w,i)=>({w,dir:hard?(i%2?"en":"zh"):(Math.random()<.5?"zh":"en")})),i:0,score:0,correct:0,locked:false,start:0};
   document.querySelector(".timer").hidden=hard;
   $("nextHardest").hidden=true;
   show("game");
@@ -508,6 +517,7 @@ function answer(key){
   cancelAnimationFrame(raf);
   const left=Math.max(0,1-(performance.now()-G.start)/TIME_LIMIT);
   const ok=key===G.answer;
+  Learning.record({name:G.player,language:lang,mode:"q",direction:G.questions[G.i].dir,word:G.questions[G.i].w,answer:key,correct:ok,elapsed:performance.now()-G.start});
   const pts=ok?(G.hard?100:100+Math.round(100*left)):0;
   G.records.push({w:G.questions[G.i].w,ok});
   G.score+=pts;
@@ -535,7 +545,8 @@ function finishGame(){
   $("rScore").textContent=fmt(G.score);
   $("rDetail").textContent=`${G.correct} of ${G.questions.length} right`;
   $("rRank").textContent=rank===1?(board.some(s=>s.score===G.score)?"Joint top score":board.length?"New top score":"First score on this lesson"):rank<=10?`That would be number ${rank} on the board`:"";
-  $("nameInput").value=store.get("mandarin-name")||"";
+  $("nameInput").value=G.player;
+  $("nameInput").readOnly=true;
   $("saveMsg").hidden=true;
   $("saveBtn").disabled=false;
   $("saveBtn").textContent="Save to leaderboard";
@@ -544,7 +555,7 @@ function finishGame(){
 
 $("nameForm").addEventListener("submit",async e=>{
   e.preventDefault();
-  const name=$("nameInput").value.trim().toUpperCase().slice(0,12);
+  const name=G?.player;
   if(!name||!G)return;
   if(G.hard&&!PLAYERS.has(name)){$("saveMsg").textContent="Use HUGZY or AZZA for this head-to-head challenge.";$("saveMsg").hidden=false;return}
   if(PREVIEW){$("saveMsg").textContent="Design preview: scores are not saved here.";$("saveMsg").hidden=false;return}
@@ -552,10 +563,7 @@ $("nameForm").addEventListener("submit",async e=>{
   $("saveBtn").textContent="Saving";
   $("replay").disabled=true;$("skipSave").disabled=true;
   try{
-    // Save the round and per-word evidence atomically using the existing append-only score store.
-    // Reserved word:v1: records have score=0 and never appear on lesson leaderboards.
-    const payload=[{lesson:G.key,name,score:G.score,correct:G.correct,total:G.questions.length},
-      ...G.records.map(r=>({lesson:wordRecord(r.w),name,score:0,correct:r.ok?1:0,total:1}))];
+    const payload=[{lesson:G.key,name,score:G.score,correct:G.correct,total:G.questions.length}];
     const [row]=await api("scores",{method:"POST",headers:{Prefer:"return=representation"},body:JSON.stringify(payload)});
     store.set("mandarin-name",name);
     lastSavedId=row.id;
@@ -575,7 +583,8 @@ $("play").addEventListener("click",startGame);
 
 let P=null,pDir="zh";
 function startPractice(){
-  P={deck:shuffle(words(current).map(w=>[...w])),total:0,known:0,flipped:false};
+  if(!Learning.player())return Learning.choose(startPractice);
+  P={player:Learning.player(),started:performance.now(),deck:shuffle(words(current).map(w=>[...w])),total:0,known:0,flipped:false};
   P.total=P.deck.length;
   $("pTitle").textContent=current;
   show("practice");
@@ -601,6 +610,8 @@ function drawPractice(){
 function pGrade(ok){
   if(!P.deck.length||!P.flipped)return;
   const c=P.deck.shift();
+  Learning.record({name:P.player,language:lang,mode:"p",direction:pDir,word:c,answer:null,correct:ok,elapsed:performance.now()-P.started});
+  P.started=performance.now();
   if(ok)P.known++;else P.deck.splice(Math.min(P.deck.length,3+Math.floor(Math.random()*4)),0,c);
   P.flipped=false;
   drawPractice();
@@ -614,6 +625,7 @@ $("pAgain").addEventListener("click",()=>pGrade(false));
 $("pGot").addEventListener("click",()=>pGrade(true));
 document.querySelectorAll("[data-dir]").forEach(b=>b.addEventListener("click",()=>{
   pDir=b.dataset.dir;
+  P.started=performance.now();
   document.querySelectorAll("[data-dir]").forEach(x=>x.setAttribute("aria-pressed",x===b));
   P.flipped=false;
   drawPractice();
