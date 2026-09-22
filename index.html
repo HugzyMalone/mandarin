@@ -198,6 +198,11 @@ h2{margin-bottom:0;font-size:1.4rem;line-height:1.1}
     <p class="label">Lessons won</p>
     <div class="standings" id="standings"></div>
   </section>
+  <section id="hardestSection">
+    <p class="label">Hugzy × Azza</p>
+    <button type="button" class="btn seal" id="openHardest">Hardest words challenge</button>
+    <p class="sub" id="hardestSummary">Loading your shared challenge…</p>
+  </section>
   <section>
     <p class="label">Contents</p>
     <div class="lessons" id="lessonList"></div>
@@ -228,6 +233,7 @@ h2{margin-bottom:0;font-size:1.4rem;line-height:1.1}
   <div class="timer"><i id="timerFill"></i></div>
   <div class="card" id="qCard" aria-live="polite"></div>
   <div class="options" id="options"></div>
+  <button type="button" class="btn" id="nextHardest" hidden>Next word</button>
 </main>
 
 <main class="view" id="result" hidden>
@@ -329,9 +335,48 @@ let D=LANG[lang].data;
 const L=()=>LANG[lang];
 const fw=(w,cls="")=>`<span class="${cls} ${L().cls}" lang="${L().tag}">${esc(w[0])}</span>`;
 const pyOf=w=>w[1]?`<span class="py">${esc(w[1])}</span>`:"";
-const words=name=>{const seen=new Set();return D.find(d=>d[0]===name)[1].filter(w=>{const k=w[0]+"|"+w[2];if(seen.has(k))return false;seen.add(k);return true})};
+const words=name=>{if(name===HARD)return challenge.pool;const seen=new Set();return D.find(d=>d[0]===name)[1].filter(w=>{const k=w[0]+"|"+w[2];if(seen.has(k))return false;seen.add(k);return true})};
 
 let scores=[],scoresError=false,current=null,lastSavedId=null;
+const HARD="Hardest words";
+const PLAYERS=new Set(["HUGZY","AZZA"]);
+const wordKey=w=>w[0]+"|"+w[2];
+// Stable IDs remain valid when vocabulary is reordered or lessons are added.
+function fingerprint(value){
+  let a=2166136261,b=5381;
+  for(const c of value){a=Math.imul(a^c.codePointAt(0),16777619);b=Math.imul(b,33)^c.codePointAt(0)}
+  return (a>>>0).toString(16).padStart(8,"0")+(b>>>0).toString(16).padStart(8,"0");
+}
+const wordRecord=w=>"word:v1:"+fingerprint(wordKey(w));
+let challenge=null;
+function buildChallenge(){
+  const day=new Date().toISOString().slice(0,10);
+  // Freeze the evidence at midnight UTC so both players get the same daily set.
+  const history=scores.filter(s=>PLAYERS.has(s.name.trim().toUpperCase())&&s.created_at<day);
+  const stats=new Map();
+  for(const s of history.filter(s=>s.lesson.startsWith("word:v1:"))){
+    const v=stats.get(s.lesson)||{miss:0,total:0};v.miss+=s.total-s.correct;v.total+=s.total;stats.set(s.lesson,v);
+  }
+  const all=[...new Map(ZH.flatMap(d=>d[1]).map(w=>[wordKey(w),w])).values()];
+  let pool=all.filter(w=>stats.get(wordRecord(w))?.miss>0).sort((a,b)=>{
+    const x=stats.get(wordRecord(a)),y=stats.get(wordRecord(b));
+    return y.miss/y.total-x.miss/x.total||y.miss-x.miss||wordKey(a).localeCompare(wordKey(b),"en");
+  }).slice(0,20);
+  const tracked=pool.length>0;
+  if(!tracked){
+    const lessons=ZH.map(([name,list])=>{
+      const rows=history.filter(s=>s.lesson===name),total=rows.reduce((n,r)=>n+r.total,0);
+      return {list,total,miss:rows.reduce((n,r)=>n+r.total-r.correct,0)};
+    }).filter(x=>x.total&&x.miss).sort((a,b)=>b.miss/b.total-a.miss/a.total);
+    pool=[...new Map(lessons.flatMap(x=>x.list).map(w=>[wordKey(w),w])).values()].slice(0,20);
+  }
+  challenge=pool.length?{pool,day,key:"hard:v1:"+day+":"+fingerprint(pool.map(wordKey).join("\n")),tracked}:null;
+  $("openHardest").disabled=scoresError||!challenge;
+  $("hardestSummary").textContent=scoresError?"Could not load your results. Reopen when connected.":!challenge?"Save a lesson score as HUGZY or AZZA to build your first challenge. New results join tomorrow’s set.":`${pool.length} words · same daily set for both players · 100 points per correct answer · no timer. `+(tracked?"Chosen from your recorded word mistakes.":"Starting with your hardest lessons; individual word tracking starts now.")+" Updates at midnight UTC.";
+}
+function challengeLesson(){return current===HARD}
+function leaderboardKey(lesson){return lesson===HARD?challenge.key:L().key(lesson)}
+
 
 function show(id){
   document.querySelectorAll("main.view").forEach(v=>v.hidden=v.id!==id);
@@ -345,13 +390,25 @@ async function api(path,opts={}){
 }
 
 async function loadScores(){
-  try{scores=await api("scores?select=id,lesson,name,score,correct,total,created_at&order=score.desc,created_at.asc&limit=5000");scoresError=false}
+  try{
+    const rows=[];
+    for(let offset=0;;offset+=1000){
+      const page=await api(`scores?select=id,lesson,name,score,correct,total,created_at&order=id.asc&limit=1000&offset=${offset}`);
+      rows.push(...page);if(page.length<1000)break;
+    }
+    scores=rows.sort((a,b)=>b.score-a.score||a.created_at.localeCompare(b.created_at));scoresError=false;
+  }
   catch{scoresError=true}
 }
 
-const boardFor=lesson=>scores.filter(s=>s.lesson===L().key(lesson));
+const boardFor=lesson=>{
+  const rows=scores.filter(s=>s.lesson===leaderboardKey(lesson));
+  if(lesson!==HARD)return rows;
+  const seen=new Set();return rows.filter(s=>{const name=s.name.trim().toUpperCase();if(!PLAYERS.has(name)||seen.has(name))return false;seen.add(name);return true});
+};
 
 function renderHome(){
+  buildChallenge();
   const wins={};
   for(const [name] of D){const top=boardFor(name)[0];if(top)wins[top.name]=(wins[top.name]||0)+1}
   const ranked=Object.entries(wins).sort((a,b)=>b[1]-a[1]);
@@ -367,14 +424,14 @@ function renderHome(){
 function renderBoard(lesson){
   const rows=boardFor(lesson).slice(0,10);
   if(scoresError){$("board").innerHTML=`<p class="empty">Scores could not load. Check your connection.</p>`;return}
-  $("board").innerHTML=rows.length?`<ol>${rows.map((s,i)=>`<li class="${s.id===lastSavedId?"me":""}"><span class="rank">${i+1}</span><span class="nm">${esc(s.name)}</span><span class="pts">${fmt(s.score)}</span><span class="det">${s.correct} of ${s.total} right · ${new Date(s.created_at).toLocaleDateString("en-GB",{day:"numeric",month:"short"})}</span></li>`).join("")}</ol>`:
+  $("board").innerHTML=rows.length?`<ol>${rows.map((s,i)=>`<li class="${s.id===lastSavedId?"me":""}"><span class="rank">${rows.filter(r=>r.score>s.score).length+1}</span><span class="nm">${esc(s.name)}</span><span class="pts">${fmt(s.score)}</span><span class="det">${s.correct} of ${s.total} right · ${new Date(s.created_at).toLocaleDateString("en-GB",{day:"numeric",month:"short"})}</span></li>`).join("")}</ol>`:
     `<p class="empty">No scores yet. First to play takes the top spot.</p>`;
 }
 
 function openLesson(name){
   current=name;
   $("lessonTitle").textContent=name;
-  $("lessonMeta").textContent=`${words(name).length} words`;
+  $("lessonMeta").textContent=name===HARD?`${challenge.day} · ${words(name).length} words · 100 points each · no timer. Best score per player; equal scores share the lead.`:`${words(name).length} words`;
   renderBoard(name);
   show("lesson");
 }
@@ -393,11 +450,20 @@ document.querySelectorAll("[data-lang]").forEach(b=>b.addEventListener("click",(
 $("lessonList").addEventListener("click",e=>{const b=e.target.closest("[data-lesson]");if(b)openLesson(b.dataset.lesson)});
 document.querySelectorAll("[data-home]").forEach(b=>b.addEventListener("click",()=>{renderHome();show("home")}));
 
+$("openHardest").addEventListener("click",async()=>{
+  $("openHardest").disabled=true;await loadScores();buildChallenge();
+  if(!scoresError&&challenge)openLesson(HARD);
+});
 let G=null,raf=0;
+function fixedOrder(items,seed){return [...items].sort((a,b)=>fingerprint(seed+wordKey(a)).localeCompare(fingerprint(seed+wordKey(b))))}
+
 
 function startGame(){
   const pool=words(current);
-  G={lesson:current,pool,questions:shuffle([...pool]).map(w=>({w,dir:Math.random()<.5?"zh":"en"})),i:0,score:0,correct:0,locked:false,start:0};
+  const hard=challengeLesson();
+  G={lesson:current,key:leaderboardKey(current),hard,pool,records:[],questions:(hard?[...pool]:shuffle([...pool])).map((w,i)=>({w,dir:hard?(i%2?"en":"zh"):(Math.random()<.5?"zh":"en")})),i:0,score:0,correct:0,locked:false,start:0};
+  document.querySelector(".timer").hidden=hard;
+  $("nextHardest").hidden=true;
   show("game");
   nextQuestion();
 }
@@ -406,8 +472,11 @@ function nextQuestion(){
   cancelAnimationFrame(raf);
   if(G.i>=G.questions.length)return finishGame();
   const {w,dir}=G.questions[G.i];
-  const others=shuffle(G.pool.filter(o=>o[0]!==w[0]&&o[2]!==w[2])).slice(0,3);
-  const opts=shuffle([w,...others]);
+  const candidates=(G.hard?[...new Map(ZH.flatMap(d=>d[1]).map(w=>[wordKey(w),w])).values()]:G.pool).filter(o=>o[0]!==w[0]&&o[2]!==w[2]);
+  const ordered=G.hard?fixedOrder(candidates,G.key+wordKey(w)):shuffle(candidates);
+  const seen=new Set(),others=ordered.filter(o=>{const k=dir==="zh"?o[2]:o[0];if(seen.has(k))return false;seen.add(k);return true}).slice(0,3);
+  const opts=G.hard?fixedOrder([w,...others],G.key+"options"+wordKey(w)):shuffle([w,...others]);
+  $("nextHardest").hidden=true;
   $("qNum").textContent=`${G.i+1} of ${G.questions.length}`;
   $("gScore").textContent=fmt(G.score);
   $("qCard").innerHTML=dir==="zh"
@@ -423,7 +492,7 @@ function nextQuestion(){
     if(left<=0)return answer(null);
     raf=requestAnimationFrame(tick);
   };
-  raf=requestAnimationFrame(tick);
+  if(!G.hard)raf=requestAnimationFrame(tick);
 }
 
 function answer(key){
@@ -432,7 +501,8 @@ function answer(key){
   cancelAnimationFrame(raf);
   const left=Math.max(0,1-(performance.now()-G.start)/TIME_LIMIT);
   const ok=key===G.answer;
-  const pts=ok?100+Math.round(100*left):0;
+  const pts=ok?(G.hard?100:100+Math.round(100*left)):0;
+  G.records.push({w:G.questions[G.i].w,ok});
   G.score+=pts;
   if(ok)G.correct++;
   $("gScore").textContent=fmt(G.score);
@@ -443,9 +513,11 @@ function answer(key){
   });
   $("qCard").insertAdjacentHTML("beforeend",`<span class="pop ${ok?"":"miss"}">${ok?`+${pts}`:key===null?"Time up":"Miss"}</span>`);
   G.i++;
-  setTimeout(()=>{if(G&&!$("game").hidden)nextQuestion()},ok?750:1600);
+  if(G.hard){$("nextHardest").hidden=false;$("nextHardest").textContent=G.i===G.questions.length?"See score":"Next word"}
+  else {const round=G;setTimeout(()=>{if(G===round&&!$("game").hidden)nextQuestion()},ok?750:1600)}
 }
 
+$("nextHardest").addEventListener("click",()=>{if(G?.hard&&G.locked)nextQuestion()});
 $("options").addEventListener("click",e=>{const b=e.target.closest("button");if(b&&G)answer(b.dataset.key)});
 $("quit").addEventListener("click",()=>{cancelAnimationFrame(raf);G=null;openLesson(current)});
 
@@ -455,7 +527,7 @@ function finishGame(){
   $("rLesson").textContent=G.lesson;
   $("rScore").textContent=fmt(G.score);
   $("rDetail").textContent=`${G.correct} of ${G.questions.length} right`;
-  $("rRank").textContent=rank===1?(board.length?"New top score":"First score on this lesson"):rank<=10?`That would be number ${rank} on the board`:"";
+  $("rRank").textContent=rank===1?(board.some(s=>s.score===G.score)?"Joint top score":board.length?"New top score":"First score on this lesson"):rank<=10?`That would be number ${rank} on the board`:"";
   $("nameInput").value=store.get("mandarin-name")||"";
   $("saveMsg").hidden=true;
   $("saveBtn").disabled=false;
@@ -467,11 +539,17 @@ $("nameForm").addEventListener("submit",async e=>{
   e.preventDefault();
   const name=$("nameInput").value.trim().toUpperCase().slice(0,12);
   if(!name||!G)return;
+  if(G.hard&&!PLAYERS.has(name)){$("saveMsg").textContent="Use HUGZY or AZZA for this head-to-head challenge.";$("saveMsg").hidden=false;return}
   if(PREVIEW){$("saveMsg").textContent="Design preview: scores are not saved here.";$("saveMsg").hidden=false;return}
   $("saveBtn").disabled=true;
   $("saveBtn").textContent="Saving";
+  $("replay").disabled=true;$("skipSave").disabled=true;
   try{
-    const [row]=await api("scores",{method:"POST",headers:{Prefer:"return=representation"},body:JSON.stringify({lesson:L().key(G.lesson),name,score:G.score,correct:G.correct,total:G.questions.length})});
+    // Save the round and per-word evidence atomically using the existing append-only score store.
+    // Reserved word:v1: records have score=0 and never appear on lesson leaderboards.
+    const payload=[{lesson:G.key,name,score:G.score,correct:G.correct,total:G.questions.length},
+      ...G.records.map(r=>({lesson:wordRecord(r.w),name,score:0,correct:r.ok?1:0,total:1}))];
+    const [row]=await api("scores",{method:"POST",headers:{Prefer:"return=representation"},body:JSON.stringify(payload)});
     store.set("mandarin-name",name);
     lastSavedId=row.id;
     await loadScores();
@@ -482,7 +560,7 @@ $("nameForm").addEventListener("submit",async e=>{
     $("saveMsg").hidden=false;
     $("saveBtn").disabled=false;
     $("saveBtn").textContent="Try again";
-  }
+  }finally{$("replay").disabled=false;$("skipSave").disabled=false}
 });
 $("replay").addEventListener("click",startGame);
 $("skipSave").addEventListener("click",()=>{G=null;openLesson(current)});
